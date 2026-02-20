@@ -1,0 +1,79 @@
+name: "Companies Grid - Full UI Validation"
+testData:
+  - searchText: "American"
+
+steps:
+  # PRIORITY 1: verifySearchFilter (Your existing logic)
+  - action: "navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/client"
+  - action: "wait"
+    value: "8000"
+  - action: "navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/client"
+  - action: "wait"
+    value: "6000" 
+  - action: "input"
+    locator: "xpath=//input[@id='search-button']"
+    value: "American"
+    clear_before: true
+    send_enter: true
+  - action: "wait"
+    value: "5000"
+  - action: "screenshot"
+    value: "Search_Results"
+
+  # PRIORITY 2: verifySorting (Company Name A-Z and Z-A)
+  - action: "refresh"
+  - action: "wait"
+    value: "8000"
+  
+  # Click 1: A-Z
+  - action: "click"
+    locator: "xpath=//div[@role='columnheader' and @data-field='companyName']"
+  - action: "wait"
+    value: "3500"
+  - action: "screenshot"
+    value: "Company_Sort_AZ"
+  - action: "screenshot"
+
+  # Click 2: Z-A (The missing step!)
+  - action: "click"
+    locator: "xpath=//div[@role='columnheader' and @data-field='companyName']"
+  - action: "wait"
+    value: "3500"
+  - action: "screenshot"
+    value: "Company_Sort_ZA"
+  - action: "screenshot"
+
+
+  # PRIORITY 3: verifyHideColumns (Your existing logic)
+  - action: "refresh"
+  - action: "wait"
+    value: "8000"
+  - action: "hover"
+    locator: "xpath=//div[@role='columnheader' and @data-field='companyName']"
+  - action: "click"
+    locator: "xpath=//button[@aria-label='Company column menu']"
+  - action: "click"
+    locator: "xpath=//li[@role='menuitem' and .//span[text()='Hide column']]"
+  - action: "wait"
+    value: "3000"
+  - action: "screenshot"
+    value: "Hide_Company_Hidden"
+
+  # PRIORITY 4: verifyPaginationFullTraversal (Replicates your while loop)
+  - action: "refresh"
+  - action: "wait"
+    value: "8000"
+  - action: "full_traversal"
+
+  # PRIORITY 5: verifySortingSource (The other missing test case!)
+  - action: "refresh"
+  - action: "wait"
+    value: "8000"
+  - action: "click"
+    locator: "xpath=//div[@role='columnheader' and @data-field='companySource']"
+  - action: "wait"
+    value: "3500"
+  - action: "screenshot"
+    value: "Source_Sort_AZ"

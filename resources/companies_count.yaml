@@ -1,0 +1,36 @@
+name: "Count Projects Per Company - YAML Driven"
+testData:
+  - clientName: "Atidan"
+  - clientName: "Razor Technology"
+  - clientName: "Microsoft"
+
+steps:
+  - action: "navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/client"
+  
+  - action: "wait"
+    value: "5000"
+
+  - action: "data_loop"
+    steps:
+      - action: "navigate"
+        url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/client"
+      
+      - action: "wait"
+        value: "3000"
+      - action: "screenshot"
+
+      - action: "input"
+        locator: "xpath=//input[@id='search-button']"
+        value: "American"
+        clear_before: true
+        send_enter: true
+      - action: "screenshot"
+
+      - action: "wait"
+        value: "2000"
+
+      - action: "custom_get_grid_count"
+        locator: "xpath=//p[contains(@class, 'MuiTablePagination-displayedRows')]"
+        screenshot_prefix: "Search_"
+      - action: "screenshot"
