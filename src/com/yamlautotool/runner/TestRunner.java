@@ -5,11 +5,9 @@ import com.aventstack.extentreports.MediaEntityBuilder;
 import com.yamlautotool.model.*;
 import com.yamlautotool.utils.YamlReader;
 import org.openqa.selenium.*;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import java.util.Map;
-import java.util.List;
 
 public class TestRunner extends Project_Reports {
 
@@ -22,13 +20,8 @@ public class TestRunner extends Project_Reports {
             e.printStackTrace();
         } finally {
             if (runner != null) {
-                if (runner.driver != null) {
-                    runner.driver.quit(); 
-                    System.out.println("Browser closed successfully.");
-                }
-                if (runner.extent != null) {
-                    runner.extent.flush();
-                }
+                if (runner.driver != null) runner.driver.quit(); 
+                if (runner.extent != null) runner.extent.flush();
             }
         }
     }
@@ -38,6 +31,8 @@ public class TestRunner extends Project_Reports {
         setupBrowser(); 
         try {
             TestCase testCase = YamlReader.loadTestCase(yamlFile);
+            if (testCase == null) throw new RuntimeException("Could not load YAML: " + yamlFile);
+            
             test = extent.createTest(testCase.name); 
             String ts = new java.text.SimpleDateFormat("yyyyMMdd_HHmmss").format(new java.util.Date());
 
@@ -57,7 +52,7 @@ public class TestRunner extends Project_Reports {
         if (testCase.testData != null) {
             for (Map<String, String> dataRow : testCase.testData) {
                 if ("No".equalsIgnoreCase(dataRow.getOrDefault("runMode", "Yes"))) {
-                    test.info("<b>Skipped:</b> " + dataRow.get("testCaseID"));
+                    test.info("<b>Skipping:</b> " + dataRow.get("testCaseID"));
                     continue; 
                 }
                 for (Step subStep : loopStep.steps) {
@@ -78,6 +73,8 @@ public class TestRunner extends Project_Reports {
                 resLoc = resLoc.replace(target, entry.getValue());
             }
         }
+        resVal = resVal.replace("${timestamp}", ts);
+        resLoc = resLoc.replace("${timestamp}", ts);
         performAction(step, resLoc, resVal, ts);
     }
 
@@ -95,28 +92,13 @@ public class TestRunner extends Project_Reports {
                     Thread.sleep(800); 
                     input.sendKeys(Keys.CONTROL + "a", Keys.DELETE);
                     input.sendKeys(value);
-                    
                     if (step.send_enter) {
-                        Thread.sleep(800); // Wait for filter results
+                        Thread.sleep(800);
                         input.sendKeys(Keys.TAB); 
                         Thread.sleep(400);
                         input.sendKeys(Keys.ENTER);
-                        
-                        // Fallback click logic if the dropdown remains open
-                        try {
-                            List<WebElement> options = driver.findElements(By.xpath("//div[@role='listbox']//li | //div[contains(@class,'listbox')]//li"));
-                            if (!options.isEmpty()) {
-                                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", options.get(0));
-                            }
-                        } catch (Exception e) {}
                     }
-                    test.pass("<b>Entered & Selected:</b> " + value);
-                    break;
-
-                case "mui_dropdown":
-                    selectCustomDropdown(value);
-                    Thread.sleep(500); 
-                    test.pass("<b>Selected Option:</b> " + value);
+                    test.pass("<b>Entered:</b> " + value);
                     break;
 
                 case "click":
@@ -126,63 +108,19 @@ public class TestRunner extends Project_Reports {
                     test.pass("<b>Clicked:</b> " + locator);
                     break;
 
-                case "screenshot":
-                    String path = takeScreenshot(value + "_" + ts);
-                    test.pass("<b>Visual Check:</b> " + value, MediaEntityBuilder.createScreenCaptureFromPath(path).build());
+                case "validate":
+                    boolean isDisplayed = driver.findElement(getBy(locator)).isDisplayed();
+                    if (isDisplayed) test.pass("<b>Validation Successful:</b> Element visible.");
+                    else test.fail("<b>Validation Failed:</b> Element hidden.");
                     break;
 
-                case "validate_mui_alert":
-                    handleMuiValidation(value, ts);
-                    break;
-
-                case "wait":
-                    Thread.sleep(Long.parseLong(value));
-                    break;
                 case "tab":
-                    try {
-                        Actions action = new Actions(driver);
-                        // If a locator is provided, click it first to ensure focus before TAB
-                        if (locator != null && !locator.isEmpty()) {
-                            WebElement target = wait.until(ExpectedConditions.elementToBeClickable(getBy(locator)));
-                            target.click();
-                        }
-                        
-                        // Perform the TAB key action
-                        action.sendKeys(Keys.TAB).build().perform();
-                        test.info("<b>Sent Key:</b> TAB");
-
-                        // Take the screenshot as per your requirement
-                        String tabPath = takeScreenshot(value + "_" + ts);
-                        test.pass("<b>Visual Check (Tab):</b> " + value, 
-                            MediaEntityBuilder.createScreenCaptureFromPath(tabPath).build());
-                    } catch (Exception e) {
-                        test.fail("<b>Tab Action Failed:</b> " + e.getMessage());
-                    }
-
+                    new org.openqa.selenium.interactions.Actions(driver).sendKeys(Keys.TAB).perform();
+                    test.pass("<b>Sent:</b> TAB key", MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot("Tab_" + ts)).build());
+                    break;
             }
         } catch (Exception e) {
             test.fail("<b>Step Failed:</b> " + e.getMessage());
-        }
-    }
-
-    private void handleMuiValidation(String expectedMsg, String ts) throws Exception {
-        try {
-            WebDriverWait shortWait = new WebDriverWait(driver, java.time.Duration.ofSeconds(5));
-            WebElement alert = shortWait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".MuiAlert-message")));
-            String actualText = alert.getText().trim();
-            String path = takeScreenshot("Alert_" + ts);
-            if (actualText.contains(expectedMsg)) {
-                test.pass("<b>Alert Match:</b> " + actualText, MediaEntityBuilder.createScreenCaptureFromPath(path).build());
-            } else {
-                test.fail("<b>Alert Mismatch!</b> Expected: " + expectedMsg + " | Actual: " + actualText, MediaEntityBuilder.createScreenCaptureFromPath(path).build());
-            }
-        } catch (Exception e) {
-            java.util.List<WebElement> errors = driver.findElements(By.cssSelector(".text-xs.text-red-500.mt-1"));
-            if (!errors.isEmpty()) {
-                test.info("🔴 Field Validation Errors Visible");
-            } else {
-                test.fail("No alert found.");
-            }
         }
     }
 

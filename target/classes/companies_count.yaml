@@ -13,8 +13,6 @@ steps:
 
   - action: "data_loop"
     steps:
-      - action: "navigate"
-        url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/client"
       
       - action: "wait"
         value: "3000"
