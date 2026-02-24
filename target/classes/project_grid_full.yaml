@@ -1,0 +1,90 @@
+name: "Project Grid - Full Suite Validation"
+testData:
+  - searchText: "American "
+
+steps:
+  # PRIORITY 1: verifySearchFilter
+  - action: "navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/projects"
+  - action: "wait"
+    value: "8000"
+  - action: "navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/projects"
+  - action: "wait"
+    value: "8000"
+  
+  - action: "screenshot"
+    value: "Search_1_Before"
+
+  - action: "input"
+    locator: "xpath=//input[@id='search-button']"
+    value: "${searchText}"
+    clear_before: true
+    send_enter: true
+  
+  - action: "wait"
+    value: "5000"
+  - action: "screenshot"
+    value: "Search_2_Results"
+
+  # PRIORITY 2: verifySorting (Client Column)
+  - action: "refresh"
+  - action: "wait"
+    value: "8000"
+  
+  - action: "click"
+    locator: "xpath=//div[@role='columnheader' and @data-field='companyName']"
+  - action: "wait"
+    value: "3500"
+  - action: "screenshot"
+    value: "Client_Sort_2_AZ"
+
+  - action: "click"
+    locator: "xpath=//div[@role='columnheader' and @data-field='companyName']"
+  - action: "wait"
+    value: "3500"
+  - action: "screenshot"
+    value: "Client_Sort_3_ZA"
+
+  # PRIORITY 3: verifyHideAllColumns
+  - action: "refresh"
+  - action: "wait"
+    value: "8000"
+  - action: "hover"
+    locator: "xpath=//div[@role='columnheader' and @data-field='companyName']"
+  - action: "click"
+    locator: "xpath=//button[@aria-label='Client column menu']"
+  - action: "click"
+    locator: "xpath=//li[@role='menuitem' and .//span[text()='Hide column']]"
+  - action: "screenshot"
+    value: "Hide_Client_Hidden"
+
+  - action: "refresh"
+  - action: "wait"
+    value: "8000"
+  - action: "hover"
+    locator: "xpath=//div[@role='columnheader' and @data-field='projectName']"
+  - action: "click"
+    locator: "xpath=//button[@aria-label='Project Name column menu']"
+  - action: "click"
+    locator: "xpath=//li[@role='menuitem' and .//span[text()='Hide column']]"
+  - action: "screenshot"
+    value: "Hide_Project_Hidden"
+
+  # PRIORITY 4: verifyPaginationFullTraversal
+  - action: "refresh"
+  - action: "wait"
+    value: "8000"
+  - action: "full_traversal"
+
+  # PRIORITY 5 & 6: Additional Sorting
+  - action: "navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/projects"
+  - action: "wait"
+    value: "8000"
+  - action: "click"
+    locator: "xpath=//div[@role='columnheader' and @data-field='projectName']"
+  - action: "wait"
+    value: "3500"
+  - action: "screenshot"
+    value: "Project_Sort_AZ"
