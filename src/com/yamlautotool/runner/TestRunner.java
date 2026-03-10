@@ -2,20 +2,24 @@ package com.yamlautotool.runner;
 
 import reports.reports.Project_Reports;
 import com.aventstack.extentreports.MediaEntityBuilder;
+import com.aventstack.extentreports.ExtentTest;
 import com.yamlautotool.model.*;
 import com.yamlautotool.utils.YamlReader;
 import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import java.util.Map;
 
 public class TestRunner extends Project_Reports {
+
+    private ExtentTest currentNode;
+    private int stepCounter = 1; // Global counter to stop jumbling
 
     public static void main(String[] args) {
         TestRunner runner = null;
         try {
             runner = new TestRunner();
-            runner.executeYaml("create_project.yaml");
+            runner.executeYaml("skill_assign.yaml");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -31,14 +35,17 @@ public class TestRunner extends Project_Reports {
         setupBrowser(); 
         try {
             TestCase testCase = YamlReader.loadTestCase(yamlFile);
-            if (testCase == null) throw new RuntimeException("Could not load YAML: " + yamlFile);
-            
             test = extent.createTest(testCase.name); 
+            currentNode = test; 
             String ts = new java.text.SimpleDateFormat("yyyyMMdd_HHmmss").format(new java.util.Date());
 
             for (Step step : testCase.steps) {
+                if (step.name != null && !step.name.isEmpty()) {
+                    currentNode = test.createNode("<b>" + step.name + "</b>");
+                }
+
                 if ("data_loop".equalsIgnoreCase(step.action)) {
-                    handleYamlDataLoop(testCase, step, ts);
+                    handleDataLoop(testCase, step, ts);
                 } else {
                     executeSingleStep(step, null, ts);
                 }
@@ -48,85 +55,100 @@ public class TestRunner extends Project_Reports {
         }
     }
 
-    private void handleYamlDataLoop(TestCase testCase, Step loopStep, String ts) {
+    private void handleDataLoop(TestCase testCase, Step loopStep, String ts) {
         if (testCase.testData != null) {
             for (Map<String, String> dataRow : testCase.testData) {
-                if ("No".equalsIgnoreCase(dataRow.getOrDefault("runMode", "Yes"))) {
-                    test.info("<b>Skipping:</b> " + dataRow.get("testCaseID"));
-                    continue; 
-                }
+                String firstVal = dataRow.values().iterator().next();
+                ExtentTest iterationNode = currentNode.createNode("Iteration: " + firstVal);
+                
+                // Switch focus to iteration node
+                ExtentTest parent = currentNode;
+                currentNode = iterationNode;
+                
                 for (Step subStep : loopStep.steps) {
                     executeSingleStep(subStep, dataRow, ts);
                 }
+                
+                currentNode = parent; // Switch back
             }
         }
     }
 
     private void executeSingleStep(Step step, Map<String, String> dataRow, String ts) {
-        String resVal = (step.value != null) ? step.value : "";
+        String resVal = (step.value != null) ? step.value : (step.url != null ? step.url : "");
         String resLoc = (step.locator != null) ? step.locator : "";
 
         if (dataRow != null) {
             for (Map.Entry<String, String> entry : dataRow.entrySet()) {
-                String target = "${" + entry.getKey() + "}";
-                resVal = resVal.replace(target, entry.getValue());
-                resLoc = resLoc.replace(target, entry.getValue());
+                String key = "${" + entry.getKey() + "}";
+                resVal = resVal.replace(key, entry.getValue());
+                resLoc = resLoc.replace(key, entry.getValue());
             }
         }
-        resVal = resVal.replace("${timestamp}", ts);
-        resLoc = resLoc.replace("${timestamp}", ts);
         performAction(step, resLoc, resVal, ts);
     }
 
     private void performAction(Step step, String locator, String value, String ts) {
+        String fileName = String.format("%03d_%s_%s", stepCounter++, step.action.toUpperCase(), ts);
+        
         try {
             switch (step.action.toLowerCase()) {
                 case "navigate":
-                    driver.get(step.url != null ? step.url : value);
-                    test.pass("<b>Navigated:</b> " + (step.url != null ? step.url : value));
+                case "silent_navigate":
+                    driver.get(value);
+                    if (!step.action.contains("silent")) {
+                        waitForGridData();
+                        currentNode.pass("Navigated: " + value, MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot(fileName)).build());
+                    }
                     break;
 
                 case "input":
                     WebElement input = wait.until(ExpectedConditions.elementToBeClickable(getBy(locator)));
-                    input.click(); 
-                    Thread.sleep(800); 
-                    input.sendKeys(Keys.CONTROL + "a", Keys.DELETE);
+                    input.click();
+                    if (step.clear_before) input.sendKeys(Keys.CONTROL + "a", Keys.DELETE);
                     input.sendKeys(value);
-                    if (step.send_enter) {
-                        Thread.sleep(800);
-                        input.sendKeys(Keys.TAB); 
-                        Thread.sleep(400);
-                        input.sendKeys(Keys.ENTER);
-                    }
-                    test.pass("<b>Entered:</b> " + value);
+                    if (step.send_enter) input.sendKeys(Keys.ENTER);
+                    Thread.sleep(1500); 
+                    currentNode.pass("Entered: " + value, MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot(fileName)).build());
                     break;
 
                 case "click":
-                    Thread.sleep(500); 
-                    WebElement element = wait.until(ExpectedConditions.elementToBeClickable(getBy(locator)));
-                    ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
-                    test.pass("<b>Clicked:</b> " + locator);
+                case "silent_click":
+                    WebElement el = wait.until(ExpectedConditions.elementToBeClickable(getBy(locator)));
+                    ((JavascriptExecutor) driver).executeScript("arguments[0].click();", el);
+                    if (!step.action.contains("silent")) {
+                        Thread.sleep(1500);
+                        waitForGridData();
+                        currentNode.pass("Clicked: " + locator, MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot(fileName)).build());
+                    }
                     break;
 
-                case "validate":
-                    boolean isDisplayed = driver.findElement(getBy(locator)).isDisplayed();
-                    if (isDisplayed) test.pass("<b>Validation Successful:</b> Element visible.");
-                    else test.fail("<b>Validation Failed:</b> Element hidden.");
+                case "custom_get_grid_count":
+                    waitForGridData();
+                    WebElement footer = wait.until(ExpectedConditions.visibilityOfElementLocated(getBy(locator)));
+                    currentNode.pass("<b>Result:</b> " + value + " | " + footer.getText(), 
+                        MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot(fileName)).build());
                     break;
 
-                case "tab":
-                    new org.openqa.selenium.interactions.Actions(driver).sendKeys(Keys.TAB).perform();
-                    test.pass("<b>Sent:</b> TAB key", MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot("Tab_" + ts)).build());
+                case "wait":
+                case "silent_wait":
+                    Thread.sleep(Long.parseLong(value));
                     break;
             }
         } catch (Exception e) {
-            test.fail("<b>Step Failed:</b> " + e.getMessage());
+            currentNode.fail("Failed: " + e.getMessage(), MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot("ERR_" + fileName)).build());
         }
+    }
+
+    private void waitForGridData() {
+        try {
+            wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[@role='row' and contains(@class, 'MuiDataGrid-row')]")));
+            Thread.sleep(1000); 
+        } catch (Exception e) { }
     }
 
     private By getBy(String locator) {
         if (locator.startsWith("xpath=")) return By.xpath(locator.substring(6));
-        if (locator.startsWith("css=")) return By.cssSelector(locator.substring(4));
         return By.id(locator);
     }
 }

@@ -1,0 +1,58 @@
+name: "Skill Creation Validation"
+testData:
+  - resourceName: "Rutuja"
+    skillName: "Java"
+    subSkillName: "Spring Boot"
+    proficiency: "4"
+steps:
+  # SETUP: Silent Login Bypass
+  - action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/skill-assignment"
+  - action: "silent_wait"
+    value: "8000"
+  - action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/skill-assignment"
+  - action: "silent_wait"
+    value: "5000"
+
+  # DATA LOOP: Replaces createSkillFromExcel Test Method
+  - action: "data_loop"
+    steps:
+      - name: "Creating Skill for ${resourceName}"
+        action: "silent_click"
+        locator: "xpath=(//button[@data-slot='button'])[2]" # Assign Button
+      
+      - action: "wait"
+        value: "2000"
+
+      # --- STEP 1: RESOURCE DROPDOWN ---
+      - action: "dropdown_select"
+        locator: "xpath=(//button[@type='button'])[9]"
+        value: "${resourceName}"
+
+      # --- STEP 2: SKILL DROPDOWN ---
+      - action: "dropdown_select"
+        locator: "xpath=(//button[@type='button'])[10]"
+        value: "${skillName}"
+
+      # --- STEP 3: SUB-SKILL DROPDOWN ---
+      - action: "dropdown_select"
+        locator: "xpath=(//button[@type='button'])[11]"
+        value: "${subSkillName}"
+      
+      # Mirroring your Tab+Enter logic
+      - action: "send_keys"
+        locator: "xpath=(//input[@type='text'])[2]"
+        value: "TAB_ENTER"
+
+      # --- STEP 4: PROFICIENCY ---
+      - action: "input"
+        locator: "xpath=(//input[@data-slot='input'])[2]"
+        value: "${proficiency}"
+
+      # --- STEP 5: SAVE ---
+      - action: "click"
+        locator: "xpath=(//button[@id='assign-button'])[3]"
+      
+      - action: "wait"
+        value: "2000"

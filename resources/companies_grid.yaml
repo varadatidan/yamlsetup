@@ -1,79 +1,77 @@
 name: "Companies Grid - Full UI Validation"
-testData:
-  - searchText: "American"
 
 steps:
-  # PRIORITY 1: verifySearchFilter (Your existing logic)
-  - action: "navigate"
+  # --- SETUP ---
+  - action: "silent_navigate"
     url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/client"
-  - action: "wait"
-    value: "8000"
-  - action: "navigate"
+  - action: "silent_wait"
+    value: "10000"
+  - action: "silent_navigate"
     url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/client"
-  - action: "wait"
-    value: "6000" 
-  - action: "input"
-    locator: "xpath=//input[@id='search-button']"
-    value: "American"
-    clear_before: true
-    send_enter: true
-  - action: "wait"
-    value: "5000"
-  - action: "screenshot"
-    value: "Search_Results"
+  - action: "silent_wait"
+    value: "6000"
 
-  # PRIORITY 2: verifySorting (Company Name A-Z and Z-A)
-  - action: "refresh"
-  - action: "wait"
-    value: "8000"
-  
-  # Click 1: A-Z
-  - action: "click"
+  # --- PRIORITY 1: HIDE COMPANY ---
+  - name: "Priority 1: Hide Company Column"
+    action: "hover"
     locator: "xpath=//div[@role='columnheader' and @data-field='companyName']"
-  - action: "wait"
-    value: "3500"
-  - action: "screenshot"
-    value: "Company_Sort_AZ"
-  - action: "screenshot"
-
-  # Click 2: Z-A (The missing step!)
   - action: "click"
-    locator: "xpath=//div[@role='columnheader' and @data-field='companyName']"
+    locator: "xpath=//div[@data-field='companyName']//button[contains(@class, 'MuiDataGrid-menuIcon')]"
+  - action: "click"
+    locator: "xpath=//li[@role='menuitem']//*[contains(text(), 'Hide column')]"
   - action: "wait"
-    value: "3500"
-  - action: "screenshot"
-    value: "Company_Sort_ZA"
-  - action: "screenshot"
-
-
-  # PRIORITY 3: verifyHideColumns (Your existing logic)
+    value: "2000"
   - action: "refresh"
-  - action: "wait"
+
+  # --- PRIORITY 2: HIDE TYPE ---
+  - name: "Priority 2: Hide Type Column"
+    action: "silent_wait"
     value: "8000"
   - action: "hover"
-    locator: "xpath=//div[@role='columnheader' and @data-field='companyName']"
+    locator: "xpath=//div[@role='columnheader' and @data-field='companyType']"
   - action: "click"
-    locator: "xpath=//button[@aria-label='Company column menu']"
+    locator: "xpath=//div[@data-field='companyType']//button[contains(@class, 'MuiDataGrid-menuIcon')]"
   - action: "click"
-    locator: "xpath=//li[@role='menuitem' and .//span[text()='Hide column']]"
+    locator: "xpath=//li[@role='menuitem']//*[contains(text(), 'Hide column')]"
   - action: "wait"
-    value: "3000"
-  - action: "screenshot"
-    value: "Hide_Company_Hidden"
-
-  # PRIORITY 4: verifyPaginationFullTraversal (Replicates your while loop)
+    value: "2000"
   - action: "refresh"
+
+  # --- PRIORITY 3: HIDE SOURCE ---
+  - name: "Priority 3: Hide Source Column"
+    action: "silent_wait"
+    value: "8000"
+  - action: "hover"
+    locator: "xpath=//div[@role='columnheader' and @data-field='companySource']"
+  - action: "click"
+    locator: "xpath=//div[@data-field='companySource']//button[contains(@class, 'MuiDataGrid-menuIcon')]"
+  - action: "click"
+    locator: "xpath=//li[@role='menuitem']//*[contains(text(), 'Hide column')]"
   - action: "wait"
+    value: "2000"
+  - action: "refresh"
+
+  # --- PRIORITY 4: FULL TRAVERSAL (Restored) ---
+  - name: "Priority 4: Full Grid Traversal"
+    action: "silent_wait"
     value: "8000"
   - action: "full_traversal"
 
-  # PRIORITY 5: verifySortingSource (The other missing test case!)
-  - action: "refresh"
-  - action: "wait"
-    value: "8000"
+
+  # --- PRIORITY 5: GLOBAL HEADER SORTING ---
+  - name: "Priority 5: Global Header Sorting Validation"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "10000"
+
+    # 1. Sort Company
   - action: "click"
-    locator: "xpath=//div[@role='columnheader' and @data-field='companySource']"
+    locator: "xpath=//div[@data-field='companyName']//*[contains(text(), 'Company')]"
   - action: "wait"
-    value: "3500"
-  - action: "screenshot"
-    value: "Source_Sort_AZ"
+    value: "2000"
+
+        # 3. Sort Source
+  - action: "click"
+    locator: "xpath=//div[@data-field='companySource']//*[contains(text(), 'Source')]"
+  - action: "wait"
+    value: "2000"

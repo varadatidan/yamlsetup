@@ -5,6 +5,6 @@ import java.util.Map;
 
 public class TestCase {
     public String name;
-    public List<Map<String, String>> testData; 
-    public List<Step> steps; 
+    public List<Map<String, String>> testData;
+    public List<Step> steps; // Ensure this is plural
 }

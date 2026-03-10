@@ -6,37 +6,30 @@ testData:
   - clientName: "Zarwin Baum"
 
 steps:
-  # ==========================================================
-  # INITIAL SETUP: Login & Page Navigation
-  # ==========================================================
-  - action: "navigate"
+  # Silent setup
+  - action: "silent_navigate"
     url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/projects"
-  
-  - action: "wait"
-    value: "8000" # Wait for MSAL Login / Authentication
-
-  - action: "navigate"
+  - action: "silent_wait"
+    value: "8000"
+  - action: "silent_navigate"
     url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/projects"
-  
-  - action: "wait"
+  - action: "silent_wait"
     value: "6000"
 
-  # ==========================================================
-  # EXECUTION: Loop through each client in testData
-  # ==========================================================
   - action: "data_loop"
     steps:
       - action: "input"
         locator: "xpath=//input[@id='search-button']"
         value: "${clientName}"
-        clear_before: true # Replicates Keys.CONTROL + "a" -> DELETE
         send_enter: true
+      
       - action: "wait"
-        value: "2500" # Wait for grid to reload results
+        value: "2500"
 
-      # Custom action to parse "1-50 of 669" and log it to Extent Report
+      # This will capture the grid for every client in the loop
+      - action: "screenshot"
+        value: "Search_Result_${clientName}"
+
       - action: "custom_get_grid_count"
         locator: "xpath=//p[contains(@class, 'MuiTablePagination-displayedRows')]"
-        value: "${clientName}" # This passes the name to the 'value' variable in Java
-      - action: "wait"
-        value: "1000"
+        value: "${clientName}"

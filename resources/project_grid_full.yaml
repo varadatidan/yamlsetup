@@ -1,90 +1,102 @@
-name: "Project Grid - Full Suite Validation"
-testData:
-  - searchText: "American "
+name: "Projects Grid - Workflow A (Perfected)"
 
 steps:
-  # PRIORITY 1: verifySearchFilter
-  - action: "navigate"
+  # --- SETUP: Bypassing MSAL ---
+  - action: "silent_navigate"
     url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/projects"
-  - action: "wait"
-    value: "8000"
-  - action: "navigate"
+  - action: "silent_wait"
+    value: "10000"
+  - action: "silent_navigate"
     url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/projects"
-  - action: "wait"
-    value: "8000"
-  
-  - action: "screenshot"
-    value: "Search_1_Before"
+  - action: "silent_wait"
+    value: "6000"
 
-  - action: "input"
-    locator: "xpath=//input[@id='search-button']"
-    value: "${searchText}"
-    clear_before: true
-    send_enter: true
-  
-  - action: "wait"
-    value: "5000"
-  - action: "screenshot"
-    value: "Search_2_Results"
-
-  # PRIORITY 2: verifySorting (Client Column)
-  - action: "refresh"
-  - action: "wait"
+  # --- P1: CLIENT ---
+  - name: "P1: Client - Sort & Hide"
+    action: "refresh"
+  - action: "silent_wait"
     value: "8000"
-  
+  # Verification Sort
   - action: "click"
-    locator: "xpath=//div[@role='columnheader' and @data-field='companyName']"
-  - action: "wait"
-    value: "3500"
-  - action: "screenshot"
-    value: "Client_Sort_2_AZ"
-
-  - action: "click"
-    locator: "xpath=//div[@role='columnheader' and @data-field='companyName']"
-  - action: "wait"
-    value: "3500"
-  - action: "screenshot"
-    value: "Client_Sort_3_ZA"
-
-  # PRIORITY 3: verifyHideAllColumns
-  - action: "refresh"
-  - action: "wait"
-    value: "8000"
+    locator: "xpath=//div[@data-field='companyName']//*[contains(text(), 'Client')]"
+  # Hide Logic
   - action: "hover"
     locator: "xpath=//div[@role='columnheader' and @data-field='companyName']"
+  - action: "silent_click" # Use silent_click for the three dots
+    locator: "xpath=//div[@data-field='companyName']//button[contains(@class, 'MuiDataGrid-menuIcon')]"
   - action: "click"
-    locator: "xpath=//button[@aria-label='Client column menu']"
-  - action: "click"
-    locator: "xpath=//li[@role='menuitem' and .//span[text()='Hide column']]"
-  - action: "screenshot"
-    value: "Hide_Client_Hidden"
-
-  - action: "refresh"
+    locator: "xpath=//li[@role='menuitem']//*[contains(text(), 'Hide column')]"
   - action: "wait"
+    value: "2000"
+
+  # --- P2: PROJECT NAME ---
+  - name: "P2: Project Name - Sort & Hide"
+    action: "refresh"
+  - action: "silent_wait"
     value: "8000"
+  # Verification Sort
+  - action: "click"
+    locator: "xpath=//div[@data-field='projectName']//*[contains(text(), 'Project Name')]"
+  # Hide Logic
   - action: "hover"
     locator: "xpath=//div[@role='columnheader' and @data-field='projectName']"
+  - action: "silent_click"
+    locator: "xpath=//div[@data-field='projectName']//button[contains(@class, 'MuiDataGrid-menuIcon')]"
   - action: "click"
-    locator: "xpath=//button[@aria-label='Project Name column menu']"
-  - action: "click"
-    locator: "xpath=//li[@role='menuitem' and .//span[text()='Hide column']]"
-  - action: "screenshot"
-    value: "Hide_Project_Hidden"
+    locator: "xpath=//li[@role='menuitem']//*[contains(text(), 'Hide column')]"
+  - action: "wait"
+    value: "2000"
 
-  # PRIORITY 4: verifyPaginationFullTraversal
-  - action: "refresh"
-  - action: "wait"
+  # --- P3: SOURCE ---
+  - name: "P3: Source - Sort & Hide"
+    action: "refresh"
+  - action: "silent_wait"
     value: "8000"
-  - action: "full_traversal"
-
-  # PRIORITY 5 & 6: Additional Sorting
-  - action: "navigate"
-    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/projects"
-  - action: "wait"
-    value: "8000"
+  # Verification Sort
   - action: "click"
-    locator: "xpath=//div[@role='columnheader' and @data-field='projectName']"
+    locator: "xpath=//div[@data-field='source']//*[contains(text(), 'Source')]"
+  # Hide Logic
+  - action: "hover"
+    locator: "xpath=//div[@role='columnheader' and @data-field='source']"
+  - action: "silent_click"
+    locator: "xpath=//div[@data-field='source']//button[contains(@class, 'MuiDataGrid-menuIcon')]"
+  - action: "click"
+    locator: "xpath=//li[@role='menuitem']//*[contains(text(), 'Hide column')]"
   - action: "wait"
-    value: "3500"
-  - action: "screenshot"
-    value: "Project_Sort_AZ"
+    value: "2000"
+
+  # --- P4: ACTIVE ---
+  - name: "P4: Active - Sort & Hide"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "8000"
+  # Verification Sort
+  - action: "click"
+    locator: "xpath=//div[@data-field='active']//*[contains(text(), 'Active')]"
+  # Hide Logic
+  - action: "hover"
+    locator: "xpath=//div[@role='columnheader' and @data-field='active']"
+  - action: "silent_click"
+    locator: "xpath=//div[@data-field='active']//button[contains(@class, 'MuiDataGrid-menuIcon')]"
+  - action: "click"
+    locator: "xpath=//li[@role='menuitem']//*[contains(text(), 'Hide column')]"
+  - action: "wait"
+    value: "2000"
+
+  # --- P5: GLOBAL SWEEP ---
+  - name: "P5: Global Sorting Sweep"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "10000"
+  - action: "click"
+    locator: "xpath=//div[@data-field='companyName']//*[contains(text(), 'Client')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='projectName']//*[contains(text(), 'Project Name')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='source']//*[contains(text(), 'Source')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='active']//*[contains(text(), 'Active')]"
+
+  # --- P6: TRAVERSAL ---
+  - name: "P6: Full Grid Traversal"
+    action: "full_traversal"

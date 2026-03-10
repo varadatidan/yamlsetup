@@ -1,0 +1,66 @@
+name: "Practice Master - Workflow A (Perfected)"
+
+steps:
+  # --- SETUP: Bypassing MSAL ---
+  - action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/practice-master"
+  - action: "silent_wait"
+    value: "10000"
+  - action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/practice-master"
+  - action: "silent_wait"
+    value: "6000"
+
+  # --- P1: PRACTICE NAME ---
+  - name: "P1: Practice Name - Sort & Hide"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "8000"
+  # Verification Sort
+  - action: "click"
+    locator: "xpath=//div[@data-field='practiceName']//*[contains(text(), 'Practice Name')]"
+  # Sequential Hide
+  - action: "hover"
+    locator: "xpath=//div[@role='columnheader' and @data-field='practiceName']"
+  - action: "silent_click"
+    locator: "xpath=//div[@data-field='practiceName']//button[contains(@class, 'MuiDataGrid-menuIcon')]"
+  - action: "click"
+    locator: "xpath=//li[@role='menuitem']//*[contains(text(), 'Hide column')]"
+  - action: "wait"
+    value: "2000"
+
+  # --- P2: ACTIVE STATUS ---
+  - name: "P2: Active Status - Sort & Hide"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "8000"
+  # Verification Sort
+  - action: "click"
+    locator: "xpath=//div[@data-field='active']//*[contains(text(), 'Active')]"
+  # Sequential Hide
+  - action: "hover"
+    locator: "xpath=//div[@role='columnheader' and @data-field='active']"
+  - action: "silent_click"
+    locator: "xpath=//div[@data-field='active']//button[contains(@class, 'MuiDataGrid-menuIcon')]"
+  - action: "click"
+    locator: "xpath=//li[@role='menuitem']//*[contains(text(), 'Hide column')]"
+  - action: "wait"
+    value: "2000"
+
+  # --- P3: GLOBAL SWEEP ---
+  - name: "P3: Global Sorting Sweep"
+    action: "refresh" # Brings back P1 and P2 columns
+  - action: "silent_wait"
+    value: "10000"
+  - action: "click"
+    locator: "xpath=//div[@data-field='practiceName']//*[contains(text(), 'Practice Name')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='practiceName']//*[contains(text(), 'Practice Name')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='active']//*[contains(text(), 'Active')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='active']//*[contains(text(), 'Active')]"
+
+  # --- P4: TRAVERSAL ---
+  - name: "P4: Full Grid Traversal"
+    action: "full_traversal"

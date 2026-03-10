@@ -1,0 +1,34 @@
+name: "Skill Assignment - Full UI & Sorting Validation"
+
+steps:
+  # --- SETUP ---
+  - action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/skill-assignment"
+  - action: "silent_wait"
+    value: "10000"
+  - action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/skill-assignment"
+  - action: "silent_wait"
+    value: "6000"
+
+  # --- PRIORITY 1: RESOURCE NAME SORTING ---
+  - name: "Priority 1: Resource Name Sorting (A-Z & Z-A)"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "8000"
+  - action: "click"
+    locator: "xpath=//div[@data-field='resourceName']//*[contains(text(), 'Resource Name')]"
+  - action: "wait"
+    value: "2000"
+  - action: "click"
+    locator: "xpath=//div[@data-field='resourceName']//*[contains(text(), 'Resource Name')]"
+  - action: "wait"
+    value: "2000"
+  - action: "click"
+    locator: "xpath=//div[@data-field='resourceName']//*[contains(text(), 'Resource Name')]"
+  # --- PRIORITY 3: FULL TRAVERSAL ---
+  - name: "Priority 3: Full Grid Pagination Traversal"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "8000"
+  - action: "full_traversal"

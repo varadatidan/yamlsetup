@@ -1,0 +1,36 @@
+name: "Resource Count Count"
+testData:
+  - resourceName: "Saurabh"
+  - resourceName: "Varad Desai"
+  - resourceName: "Reji"
+
+steps:
+  # SETUP: Silent navigation to bypass MSAL/Login hang
+  - action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/resources"
+  - action: "silent_wait"
+    value: "8000"
+  - action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/resources"
+  - action: "silent_wait"
+    value: "5000"
+
+  # DATA LOOP: This replaces the TestNG DataProvider
+  - action: "data_loop"
+    steps:
+      - action: "input"
+        locator: "xpath=//input[@id='search-button']"
+        value: "${resourceName}"
+        send_enter: true
+      
+      - action: "wait"
+        value: "3000" # Wait for Resource Grid to filter
+
+      # Capture the search result visually
+      - action: "screenshot"
+        value: "Resource_Search_${resourceName}"
+
+      # Use the custom count logic already in your Test Runner
+      - action: "custom_get_grid_count"
+        locator: "xpath=//p[contains(@class, 'MuiTablePagination-displayedRows')]"
+        value: "${resourceName}"

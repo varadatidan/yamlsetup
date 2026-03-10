@@ -1,0 +1,93 @@
+name: "Resources Grid - Full UI & Sorting Validation"
+
+steps:
+  # --- SETUP ---
+  - action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/resources"
+  - action: "silent_wait"
+    value: "10000"
+  - action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/resources"
+  - action: "silent_wait"
+    value: "6000"
+
+  # --- PRIORITY 1: RESOURCE NAME (Sort & Hide) ---
+  - name: "Priority 1: Resource Name - Sort & Hide"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "8000"
+  # Sort A-Z and Z-A
+  - action: "click"
+    locator: "xpath=//div[@data-field='resourceName']//*[contains(text(), 'Resource Name')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='resourceName']//*[contains(text(), 'Resource Name')]"
+  # Hide Logic
+  - action: "hover"
+    locator: "xpath=//div[@role='columnheader' and @data-field='resourceName']"
+  - action: "silent_click"
+    locator: "xpath=//div[@data-field='resourceName']//button[contains(@class, 'MuiDataGrid-menuIcon')]"
+  - action: "click"
+    locator: "xpath=//li[@role='menuitem']//*[contains(text(), 'Hide column')]"
+
+  # --- PRIORITY 2: DESIGNATION (Sort & Hide) ---
+  - name: "Priority 2: Designation - Sort & Hide"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "8000"
+  - action: "click"
+    locator: "xpath=//div[@data-field='designationName']//*[contains(text(), 'Designation')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='designationName']//*[contains(text(), 'Designation')]"
+  - action: "hover"
+    locator: "xpath=//div[@role='columnheader' and @data-field='designationName']"
+  - action: "silent_click"
+    locator: "xpath=//div[@data-field='designationName']//button[contains(@class, 'MuiDataGrid-menuIcon')]"
+  - action: "click"
+    locator: "xpath=//li[@role='menuitem']//*[contains(text(), 'Hide column')]"
+
+  # --- PRIORITY 3: DEPARTMENT (Sort & Hide) ---
+  - name: "Priority 3: Department - Sort & Hide"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "8000"
+  - action: "click"
+    locator: "xpath=//div[@data-field='departmentName']//*[contains(text(), 'Department')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='departmentName']//*[contains(text(), 'Department')]"
+  - action: "hover"
+    locator: "xpath=//div[@role='columnheader' and @data-field='departmentName']"
+  - action: "silent_click"
+    locator: "xpath=//div[@data-field='departmentName']//button[contains(@class, 'MuiDataGrid-menuIcon')]"
+  - action: "click"
+    locator: "xpath=//li[@role='menuitem']//*[contains(text(), 'Hide column')]"
+
+  # --- PRIORITY 4: FULL TRAVERSAL ---
+  - name: "Priority 4: Full Grid Traversal"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "8000"
+  - action: "full_traversal"
+
+  # --- PRIORITY 5: GLOBAL SWEEP SORTING ---
+  - name: "Priority 5: Global Header Sorting Sweep"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "10000"
+  - action: "click"
+    locator: "xpath=//div[@data-field='resourceName']//*[contains(text(), 'Resource Name')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='resourceName']//*[contains(text(), 'Resource Name')]"
+    
+  - action: "click"
+    locator: "xpath=//div[@data-field='designationName']//*[contains(text(), 'Designation')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='designationName']//*[contains(text(), 'Designation')]"
+
+  - action: "click"
+    locator: "xpath=//div[@data-field='departmentName']//*[contains(text(), 'Department')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='departmentName']//*[contains(text(), 'Department')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='active']//*[contains(text(), 'Active')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='active']//*[contains(text(), 'Active')]"
