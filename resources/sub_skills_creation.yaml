@@ -1,0 +1,62 @@
+name: "Sub-Skills - Full Mouse Interaction Flow"
+
+testData:
+  - category_name: "Software Automation"
+    sub_skill_name: "Selenium Java"
+
+steps:
+  # --- SETUP ---
+  - action: "navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/sub-skills"
+  - action: "silent_wait"
+    value: "10000"
+  - action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/sub-skills"
+  - action: "silent_wait"
+    value: "6000"
+
+  # --- P1: DATA DRIVEN CREATION ---
+  - name: "P1: Add Sub-Skill Full Flow"
+    action: "data_loop"
+    steps:
+      # 1. Open Dialog
+      - action: "click"
+        locator: "xpath=(//button[@id='assign-button'])[2]"
+      - action: "silent_wait"
+        value: "3000"
+
+      # 2. SELECT CATEGORY (Mouse Flow)
+      # First, hover and click the select box to focus it
+      - action: "hover"
+        locator: "xpath=//select[contains(@class, 'border')]"
+      - action: "click"
+        locator: "xpath=//select[contains(@class, 'border')]"
+      - action: "silent_wait"
+        value: "1000"
+      
+      # Now, click the specific option by text
+      - action: "click"
+        locator: "xpath=//select/option[text()='${category_name}' or contains(., '${category_name}')]"
+      - action: "silent_wait"
+        value: "1000"
+
+      # 3. INPUT SUB-SKILL NAME
+      - action: "input"
+        locator: "xpath=(//input[@id='search-button'])[2]"
+        value: "${sub_skill_name}"
+        clear_before: true
+
+      # 4. TOGGLE ACTIVE CHECKBOX (The missing step)
+      # Your HTML shows: <input type="checkbox" checked="">
+      - action: "click"
+        locator: "xpath=//input[@type='checkbox']/following-sibling::label[contains(text(), 'Active')] | //input[@type='checkbox']"
+      
+      - action: "silent_wait"
+        value: "1000"
+
+      # 5. SAVE / CREATE
+      - action: "click"
+        locator: "xpath=(//button[@id='assign-button'])[3]"
+      
+      - action: "silent_wait"
+        value: "5000"

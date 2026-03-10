@@ -1,0 +1,56 @@
+name: "Skill Categories - Search & Mark Inactive"
+
+testData:
+  - category_name: "Software Automation"
+
+steps:
+  # --- SETUP: Dual Navigation ---
+  - action: "navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/skills-category"
+  - action: "silent_wait"
+    value: "10000"
+  - action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/skills-category"
+  - action: "silent_wait"
+    value: "6000"
+
+  # --- P1: SEARCH AND DEACTIVATE ---
+  - name: "P1: Search, Click Result and Deactivate"
+    action: "data_loop"
+    steps:
+      # 1. Use the Grid Search Box to find the category
+      - action: "click"
+        locator: "xpath=(//input[@id='search-button'])[1]"
+      - action: "input"
+        locator: "xpath=(//input[@id='search-button'])[1]"
+        value: "${category_name}"
+        clear_before: true
+        send_enter: true
+      
+      # Wait for grid to filter
+      - action: "silent_wait"
+        value: "4000"
+
+      # 2. Click the specific category name in the grid result to open Dialog
+      - action: "click"
+        locator: "xpath=//div[@role='gridcell' and contains(., '${category_name}')]"
+      
+      # Wait for the Radix Pop-up to animate open
+      - action: "silent_wait"
+        value: "3000"
+
+      # 3. Toggle the Active Checkbox
+      # This clicks the Radix checkbox button to change state from 'checked' to 'unchecked'
+      - action: "click"
+        locator: "xpath=//button[@role='checkbox' or @data-slot='checkbox']"
+      
+      - action: "silent_wait"
+        value: "1500"
+
+      # 4. Save the Changes
+      # Index [3] is the Save button inside the Dialog footer
+      - action: "click"
+        locator: "xpath=(//button[@id='assign-button'])[3]"
+      
+      - action: "silent_wait"
+        value: "5000"

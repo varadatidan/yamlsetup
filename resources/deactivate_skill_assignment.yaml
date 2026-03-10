@@ -1,0 +1,58 @@
+name: "Skill Assignment - Mark Skill Inactive"
+
+testData:
+  - resource_name: "Rutuja Pandya"
+    skill_name: "QA"
+    sub_skill: "API Azure"
+
+steps:
+  # --- SETUP: Standard Navigation ---
+  - action: "navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/skill-assignment"
+  - action: "silent_wait"
+    value: "10000"
+  - action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/skill-assignment"
+  - action: "silent_wait"
+    value: "6000"
+
+  # --- P1: SEARCH AND OPEN DIALOG ---
+  - action: "data_loop"
+    name: "P1: Deactivating Skill"
+    steps:
+      # 1. Search for the resource
+      - action: "click"
+        locator: "xpath=//input[@id='search-button']"
+      - action: "input"
+        locator: "xpath=//input[@id='search-button']"
+        value: "${resource_name}"
+        clear_before: true
+        send_enter: true
+      - action: "silent_wait"
+        value: "4000"
+
+      # 2. Click the Resource to open Dialog
+      - action: "click"
+        locator: "xpath=//div[@data-field='resourceName' and contains(., '${resource_name}')]"
+      - action: "silent_wait"
+        value: "3000"
+
+      # 3. Verify the Skill/Subskill is correct (Optional but good for reports)
+      # This step just ensures the dialog loaded the right data
+      - action: "silent_wait"
+        value: "1000"
+
+      # 4. TOGGLE ACTIVE CHECKBOX
+      # We target the label to ensure a clean click in Shadcn/Radix UIs
+      - action: "click"
+        locator: "xpath=//label[@for='update-active' or contains(text(), 'Active')]"
+      
+      - action: "silent_wait"
+        value: "1000"
+
+      # 5. SAVE CHANGES
+      - action: "click"
+        locator: "xpath=(//button[@id='assign-button'])[3]"
+      
+      - action: "silent_wait"
+        value: "5000"

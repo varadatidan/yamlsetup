@@ -19,7 +19,15 @@ public class TestRunner extends Project_Reports {
         TestRunner runner = null;
         try {
             runner = new TestRunner();
-            runner.executeYaml("skill_assign.yaml");
+//            runner.executeYaml("skill_assign.yaml");
+//            runner.executeYaml("skill_assignment_via_grid.yaml");       
+//            runner.executeYaml("deactivate_skill_assignment.yaml");
+//            runner.executeYaml("skill_category_creation.yaml");
+//            runner.executeYaml("skill_category_deactivate.yaml");
+//            runner.executeYaml("sub_skills_creation.yaml");
+//            runner.executeYaml("practice_designation_assignment.yaml");
+            runner.executeYaml("practice_master_creation.yaml");
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

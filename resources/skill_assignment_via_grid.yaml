@@ -1,0 +1,76 @@
+name: "Skill Assignment - Grid Search Fix"
+
+testData:
+  - resource_name: "Rutuja Pandya"
+    skill_name: "QA"
+    sub_skill: "API Azure"
+    proficiency_score: "4"
+
+steps:
+  # --- SETUP ---
+  - action: "navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/skill-assignment"
+  - action: "silent_wait"
+    value: "10000"
+  - action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/skill-assignment"
+  - action: "silent_wait"
+    value: "8000"
+
+  # --- P1: DATA DRIVEN SEARCH & ASSIGN ---
+  - action: "data_loop"
+    name: "P1: Search and Update Resource"
+    steps:
+      # 1. Search for Name (Now inside the loop so ${resource_name} works)
+      - action: "click"
+        locator: "xpath=//input[@id='search-button']"
+      - action: "input"
+        locator: "xpath=//input[@id='search-button']"
+        value: "${resource_name}"
+        clear_before: true
+        send_enter: true
+      - action: "silent_wait"
+        value: "4000"
+
+      # 2. Click the Grid Result
+      - action: "click"
+        locator: "xpath=//div[@data-field='resourceName' and contains(., '${resource_name}')]"
+      - action: "silent_wait"
+        value: "3000"
+
+      # 3. Fill Dialog Fields
+      - action: "click"
+        locator: "xpath=//label[text()='Skill']/following-sibling::div//button"
+      - action: "input"
+        locator: "xpath=//input[@placeholder='Search...']"
+        value: "${skill_name}"
+        clear_before: true
+      - action: "silent_wait"
+        value: "2000"
+      - action: "hover"
+        locator: "xpath=//button[contains(@class, 'hover:bg-gray-100')]//span[contains(text(), '${skill_name}')]"
+      - action: "click"
+        locator: "xpath=//button[contains(@class, 'hover:bg-gray-100')]//span[contains(text(), '${skill_name}')]"
+
+      - action: "click"
+        locator: "xpath=//label[text()='SubSkill']/following-sibling::div//button"
+      - action: "input"
+        locator: "xpath=//input[@placeholder='Search...']"
+        value: "${sub_skill}"
+        clear_before: true
+      - action: "silent_wait"
+        value: "2000"
+      - action: "hover"
+        locator: "xpath=//button[contains(@class, 'hover:bg-gray-100')]//span[contains(text(), '${sub_skill}')]"
+      - action: "click"
+        locator: "xpath=//button[contains(@class, 'hover:bg-gray-100')]//span[contains(text(), '${sub_skill}')]"
+
+      - action: "input"
+        locator: "xpath=//input[@type='number' and @min='1']"
+        value: "${proficiency_score}"
+        clear_before: true
+
+      - action: "click"
+        locator: "xpath=(//button[@id='assign-button'])[3]"
+      - action: "silent_wait"
+        value: "5000"

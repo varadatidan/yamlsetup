@@ -1,0 +1,68 @@
+name: "Practice Master - Create & Validate"
+
+testData:
+  - practice_name: "Quality Engineering"
+  - practice_name: "Cloud Ops"
+
+steps:
+  # --- SETUP: Standard Navigation ---
+  - action: "navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/practice-master"
+  - action: "silent_wait"
+    value: "10000"
+  - action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/practice-master"
+  - action: "silent_wait"
+    value: "6000"
+
+  # --- PRIORITY 1: TRIGGER VALIDATIONS ---
+  - name: "P1: Form Validation Capture"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "8000"
+  # 1. Open Add Practice Dialog (Index 2 for main page button)
+  - action: "click"
+    locator: "xpath=(//button[@id='assign-button'])[2]"
+  - action: "silent_wait"
+    value: "2000"
+  # 2. Click Save immediately without data to trigger red error messages
+  # (Index 3 corresponds to the blue 'Save' button in the popup)
+  - action: "click"
+    locator: "xpath=(//button[@id='assign-button'])[3]"
+  - action: "wait"
+    value: "3000"
+  # 3. Close Dialog to reset for actual data entry
+  - action: "click"
+    locator: "xpath=//button[@data-slot='dialog-close']"
+
+  # --- PRIORITY 2: DATA DRIVEN CREATION ---
+  - name: "P2: Add New Practices"
+    action: "data_loop"
+    steps:
+      # 1. Open the Dialog
+      - action: "click"
+        locator: "xpath=(//button[@id='assign-button'])[2]"
+      - action: "silent_wait"
+        value: "2000"
+
+      # 2. Input Practice Name
+      # Using index [2] to avoid the background grid search box
+      - action: "input"
+        locator: "xpath=(//input[@id='search-button'])[2]"
+        value: "${practice_name}"
+        clear_before: true
+
+      # 3. Mark Practice Active
+      # Targeted by role and data-slot for Radix stability
+      - action: "click"
+        locator: "xpath=//button[@role='checkbox' or @data-slot='checkbox']"
+      
+      - action: "silent_wait"
+        value: "1000"
+
+      # 4. Save
+      - action: "click"
+        locator: "xpath=(//button[@id='assign-button'])[3]"
+      
+      - action: "silent_wait"
+        value: "5000"

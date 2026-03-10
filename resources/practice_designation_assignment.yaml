@@ -1,0 +1,95 @@
+name: "Practice Designation - Sequential Workflow Fix"
+
+testData:
+  - practice_name: "Quality"
+    designation_name: "Automation Engineer"
+    level_name: "Level 2"
+
+steps:
+  # --- SETUP: Standard Navigation ---
+  - action: "navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/practice-designation-level"
+  - action: "silent_wait"
+    value: "10000"
+  - action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/practice-designation-level"
+  - action: "silent_wait"
+    value: "6000"
+
+  # --- P1: TRIGGER VALIDATION (MANDATORY) ---
+  - name: "P1: Validation Capture"
+    action: "refresh" # Added action to the name block for structural integrity
+  - action: "click"
+    locator: "xpath=(//button[@id='assign-button'])[2]"
+  - action: "silent_wait"
+    value: "2000"
+  - action: "click"
+    locator: "xpath=(//button[@id='assign-button'])[3]"
+  - action: "wait"
+    value: "3000"
+  - action: "click"
+    locator: "xpath=//button[@data-slot='dialog-close']"
+
+  # --- P2: SEQUENTIAL DATA ENTRY ---
+  - name: "P2: Practice Designation Process"
+    action: "data_loop"
+    steps:
+      # 1. Open Dialog
+      - action: "click"
+        locator: "xpath=(//button[@id='assign-button'])[2]"
+      - action: "silent_wait"
+        value: "2000"
+
+      # 2. SELECT PRACTICE
+      - action: "click"
+        locator: "xpath=//button[.//span[contains(text(), 'Select practice')]]"
+      - action: "input"
+        locator: "xpath=//input[@placeholder='Search...']"
+        value: "${practice_name}"
+        clear_before: true
+      - action: "silent_wait"
+        value: "1500"
+      - action: "hover"
+        locator: "xpath=//button[contains(@class, 'hover:bg-gray-100')]//span[contains(text(), '${practice_name}')]"
+      - action: "click"
+        locator: "xpath=//button[contains(@class, 'hover:bg-gray-100')]//span[contains(text(), '${practice_name}')]"
+      - action: "silent_wait"
+        value: "1500"
+
+      # 3. SELECT DESIGNATION
+      - action: "click"
+        locator: "xpath=//button[.//span[contains(text(), 'Select designation') or contains(text(), 'Select practice first')]]"
+      - action: "input"
+        locator: "xpath=//input[@placeholder='Search...']"
+        value: "${designation_name}"
+        clear_before: true
+      - action: "silent_wait"
+        value: "1500"
+      - action: "hover"
+        locator: "xpath=//button[contains(@class, 'hover:bg-gray-100')]//span[contains(text(), '${designation_name}')]"
+      - action: "click"
+        locator: "xpath=//button[contains(@class, 'hover:bg-gray-100')]//span[contains(text(), '${designation_name}')]"
+      - action: "silent_wait"
+        value: "1500"
+
+      # 4. SELECT LEVEL
+      - action: "click"
+        locator: "xpath=//button[.//span[contains(text(), 'Select level')]]"
+      - action: "input"
+        locator: "xpath=//input[@placeholder='Search...']"
+        value: "${level_name}"
+        clear_before: true
+      - action: "silent_wait"
+        value: "1500"
+      - action: "hover"
+        locator: "xpath=//button[contains(@class, 'hover:bg-gray-100')]//span[contains(text(), '${level_name}')]"
+      - action: "click"
+        locator: "xpath=//button[contains(@class, 'hover:bg-gray-100')]//span[contains(text(), '${level_name}')]"
+      - action: "silent_wait"
+        value: "1500"
+
+      # 5. FINAL ASSIGN
+      - action: "click"
+        locator: "xpath=(//button[@id='assign-button'])[3]"
+      - action: "silent_wait"
+        value: "5000"

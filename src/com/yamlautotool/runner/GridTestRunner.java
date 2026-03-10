@@ -27,7 +27,7 @@ public class GridTestRunner extends Project_Reports {
           runner.executeYaml("skill_categories.yaml");         
           runner.executeYaml("skills.yaml");
           runner.executeYaml("practice_roles.yaml");
-          runner.executeYaml("practice_master.yaml");
+          runner.executeYaml("practice_master_grid.yaml");
 
 
         } catch (Exception e) {

@@ -1,57 +1,105 @@
-name: "Skill Assignment - Search and Select Result"
+name: "Skill Assignment - End-to-End Flow & Validation"
 
 testData:
-  - search_query: "Rutuja"
-    skill_name: "Automation Testing"
+  - resource_name: "Rutuja"
+    skill_name: "QA"
+    sub_skill: "API"
+    proficiency_score: "3"
+  - resource_name: "Hazel"
+    skill_name: "BigData"
+    sub_skill: "Hadoop"
+    proficiency_score: "3"
 
 steps:
-  # --- SETUP ---
+  # --- SETUP: Dual Navigation Pattern ---
+  - action: "navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/skill-assignment"
+  - action: "silent_wait"
+    value: "8000"
   - action: "silent_navigate"
     url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/skill-assignment"
   - action: "silent_wait"
-    value: "10000"
+    value: "5000"
 
-  - action: "data_loop"
-    name: "P1: Search and Select Resource"
+  # --- P1: MANDATORY FIELD VALIDATION ---
+  - name: "P1: Form Validation Capture"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "8000"
+  # Open Dialog
+  - action: "click"
+    locator: "xpath=(//button[@id='assign-button'])[2]"
+  - action: "silent_wait"
+    value: "2000"
+  # Click Save (Index 3) without data to trigger red error messages
+  - action: "click"
+    locator: "xpath=(//button[@id='assign-button'])[3]"
+  # Use standard wait (not silent) to ensure report captures the red text
+  - action: "wait"
+    value: "3000"
+  # Close Dialog to reset for actual data entry
+  - action: "click"
+    locator: "xpath=//button[@data-slot='dialog-close']"
+
+  # --- P2: DATA DRIVEN ASSIGNMENT PROCESS ---
+  - name: "P2: Skill Assignment Process"
+    action: "data_loop"
     steps:
       # 1. Open the Assign Dialog
       - action: "click"
-        locator: "xpath=//button[@id='assign-button' or contains(., 'Assign')]"
+        locator: "xpath=(//button[@id='assign-button'])[2]"
       
-      # 2. Click the Resource Dropdown to reveal the search input
+      # 2. SELECT RESOURCE
       - action: "click"
-        locator: "xpath=//button[.//span[contains(text(), '-- Select Resource --')]]"
-      
-      # 3. Input the search term (Rutuja)
+        locator: "xpath=//button[.//span[contains(text(), 'Select Resource')]]"
       - action: "input"
         locator: "xpath=//input[@placeholder='Search...']"
-        value: "${search_query}"
+        value: "${resource_name}"
         clear_before: true
-        # We don't send Enter here yet, because we need to click the filtered result
-      
       - action: "silent_wait"
-        value: "2000"
-
-      # 4. Select the specific value "Rutuja" from the filtered list
-      # This targets the item in the dropdown list that matches the search query
+        value: "1500"
+      - action: "hover"
+        locator: "xpath=//button[contains(@class, 'hover:bg-gray-100')]//span[contains(text(), '${resource_name}')]"
       - action: "click"
-        locator: "xpath=//div[@role='option' or contains(@class, 'select-item')][descendant::*[contains(text(), '${search_query}')]]"
-      
-      - action: "silent_wait"
-        value: "1000"
+        locator: "xpath=//button[contains(@class, 'hover:bg-gray-100')]//span[contains(text(), '${resource_name}')]"
 
-      # --- REPEAT FOR SKILL ---
+      # 3. SELECT SKILL
       - action: "click"
-        locator: "xpath=//button[.//span[contains(text(), '-- Select Skill --')]]"
-
+        locator: "xpath=//button[.//span[contains(text(), 'Select Skill')]]"
       - action: "input"
         locator: "xpath=//input[@placeholder='Search...']"
         value: "${skill_name}"
         clear_before: true
-
+      - action: "silent_wait"
+        value: "1500"
+      - action: "hover"
+        locator: "xpath=//button[contains(@class, 'hover:bg-gray-100')]//span[contains(text(), '${skill_name}')]"
       - action: "click"
-        locator: "xpath=//div[@role='option' or contains(@class, 'select-item')][descendant::*[contains(text(), '${skill_name}')]]"
+        locator: "xpath=//button[contains(@class, 'hover:bg-gray-100')]//span[contains(text(), '${skill_name}')]"
 
-      # --- SAVE ---
+      # 4. SELECT SUB-SKILL
       - action: "click"
-        locator: "xpath=//button[@type='submit' or contains(text(), 'Save')]"
+        locator: "xpath=//button[.//span[contains(text(), '-- Select SubSkill --')]]"
+      - action: "input"
+        locator: "xpath=//input[@placeholder='Search...']"
+        value: "${sub_skill}"
+        clear_before: true
+      - action: "silent_wait"
+        value: "1500"
+      - action: "hover"
+        locator: "xpath=//button[contains(@class, 'hover:bg-gray-100')]//span[contains(text(), '${sub_skill}')]"
+      - action: "click"
+        locator: "xpath=//button[contains(@class, 'hover:bg-gray-100')]//span[contains(text(), '${sub_skill}')]"
+
+      # 5. INPUT PROFICIENCY
+      - action: "input"
+        locator: "xpath=//input[@id='search-button' and @type='number']"
+        value: "${proficiency_score}"
+        clear_before: true
+        send_enter: true
+
+      # 6. SAVE
+      - action: "click"
+        locator: "xpath=(//button[@id='assign-button'])[3]"
+      - action: "silent_wait"
+        value: "5000"
