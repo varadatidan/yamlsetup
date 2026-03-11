@@ -34,6 +34,7 @@ public class GridTestRunner extends Project_Reports {
 //            runner.executeYaml("roles_grid_validation.yaml");
 //			 runner.executeYaml("data_imports_grid_validation.yaml");
 			 runner.executeYaml("email_templates_grid_validation.yaml");
+			 runner.executeYaml("notification_templates_grid_validation.yaml");
 
         } catch (Exception e) {
             e.printStackTrace();
