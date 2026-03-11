@@ -1,0 +1,45 @@
+name: "Roles Grid - Single Column UI & Sorting Validation"
+
+steps:
+  # --- SETUP: Standard Navigation ---
+  - action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/roles"
+  - action: "silent_wait"
+    value: "10000"
+  - action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/roles"
+  - action: "silent_wait"
+    value: "6000"
+
+  # --- PRIORITY 1: USER NAME (Sort & Hide) ---
+  - name: "Priority 1: User Name - Sort & Hide"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "8000"
+  # Sort Toggle A-Z / Z-A
+  - action: "click"
+    locator: "xpath=//div[@data-field='userName']//*[contains(text(), 'User Name')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='userName']//*[contains(text(), 'User Name')]"
+  
+  # Hide Logic via MUI Menu
+  - action: "hover"
+    locator: "xpath=//div[@role='columnheader' and @data-field='userName']"
+  - action: "silent_click"
+    locator: "xpath=//div[@data-field='userName']//button[contains(@class, 'MuiDataGrid-menuIcon')]"
+  - action: "click"
+    locator: "xpath=//li[@role='menuitem']//*[contains(text(), 'Hide column')]"
+
+  # --- PRIORITY 2: FULL TRAVERSAL ---
+  - name: "Priority 2: Full Grid Traversal"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "8000"
+  - action: "full_traversal"
+
+  # --- PRIORITY 3: QUICK SWEEP ---
+  - name: "Priority 3: Final Sorting Sweep"
+    action: "click"
+    locator: "xpath=//div[@data-field='userName']//*[contains(text(), 'User Name')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='userName']//*[contains(text(), 'User Name')]"

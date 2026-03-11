@@ -1,0 +1,89 @@
+name: "Holiday Grid - Full UI & Sorting Validation"
+
+steps:
+  # --- SETUP: Standard Navigation ---
+  - action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/holiday"
+  - action: "silent_wait"
+    value: "10000"
+  - action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/holiday"
+  - action: "silent_wait"
+    value: "6000"
+
+  # --- PRIORITY 1: HOLIDAY NAME (Sort & Hide) ---
+  - name: "Priority 1: Holiday Name - Sort & Hide"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "8000"
+  # Sort Toggle
+  - action: "click"
+    locator: "xpath=//div[@data-field='holidayName']//*[contains(text(), 'Holiday Name')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='holidayName']//*[contains(text(), 'Holiday Name')]"
+  # Hide Logic via MUI Menu
+  - action: "hover"
+    locator: "xpath=//div[@role='columnheader' and @data-field='holidayName']"
+  - action: "silent_click"
+    locator: "xpath=//div[@data-field='holidayName']//button[contains(@class, 'MuiDataGrid-menuIcon')]"
+  - action: "click"
+    locator: "xpath=//li[@role='menuitem']//*[contains(text(), 'Hide column')]"
+
+  # --- PRIORITY 2: DATE FROM (Sort & Hide) ---
+  - name: "Priority 2: Date From - Sort & Hide"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "8000"
+  - action: "click"
+    locator: "xpath=//div[@data-field='dateFrom']//*[contains(text(), 'From')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='dateFrom']//*[contains(text(), 'From')]"
+  - action: "hover"
+    locator: "xpath=//div[@role='columnheader' and @data-field='dateFrom']"
+  - action: "silent_click"
+    locator: "xpath=//div[@data-field='dateFrom']//button[contains(@class, 'MuiDataGrid-menuIcon')]"
+  - action: "click"
+    locator: "xpath=//li[@role='menuitem']//*[contains(text(), 'Hide column')]"
+
+  # --- PRIORITY 3: DATE TO (Sort & Hide) ---
+  - name: "Priority 3: Date To - Sort & Hide"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "8000"
+  - action: "click"
+    locator: "xpath=//div[@data-field='dateTo']//*[contains(text(), 'To')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='dateTo']//*[contains(text(), 'To')]"
+  - action: "hover"
+    locator: "xpath=//div[@role='columnheader' and @data-field='dateTo']"
+  - action: "silent_click"
+    locator: "xpath=//div[@data-field='dateTo']//button[contains(@class, 'MuiDataGrid-menuIcon')]"
+  - action: "click"
+    locator: "xpath=//li[@role='menuitem']//*[contains(text(), 'Hide column')]"
+
+  # --- PRIORITY 4: FULL TRAVERSAL ---
+  - name: "Priority 4: Full Grid Traversal"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "8000"
+  - action: "full_traversal"
+
+  # --- PRIORITY 5: GLOBAL SWEEP SORTING ---
+  - name: "Priority 5: Global Header Sorting Sweep"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "10000"
+  - action: "click"
+    locator: "xpath=//div[@data-field='holidayName']//*[contains(text(), 'Holiday Name')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='holidayName']//*[contains(text(), 'Holiday Name')]"
+    
+  - action: "click"
+    locator: "xpath=//div[@data-field='dateFrom']//*[contains(text(), 'From')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='dateFrom']//*[contains(text(), 'From')]"
+
+  - action: "click"
+    locator: "xpath=//div[@data-field='dateTo']//*[contains(text(), 'To')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='dateTo']//*[contains(text(), 'To')]"

@@ -1,0 +1,73 @@
+name: "Holiday Management - Create & Validate"
+
+testData:
+  - holiday_name: "Republic Day"
+    date_from: "01-26-2026"
+    date_to: "01-26-2026"
+steps:
+  # --- SETUP: Dual Navigation ---
+  - action: "navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/holiday"
+  - action: "silent_wait"
+    value: "10000"
+  - action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/holiday"
+  - action: "silent_wait"
+    value: "6000"
+
+  # --- PRIORITY 1: TRIGGER VALIDATIONS ---
+  - name: "P1: Form Validation Capture"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "8000"
+  # 1. Open Add Holiday Dialog (Index 2 for the main Add button)
+  - action: "click"
+    locator: "xpath=(//button[@id='assign-button'])[2]"
+  - action: "silent_wait"
+    value: "2000"
+  # 2. Click Create (Index 3) without data to trigger red error messages
+  - action: "click"
+    locator: "xpath=(//button[@id='assign-button'])[24]"
+  - action: "wait"
+    value: "3000"
+  # 3. Close Dialog to reset
+  - action: "click"
+    locator: "xpath=//button[@data-slot='dialog-close']"
+
+  # --- PRIORITY 2: DATA DRIVEN CREATION ---
+  - name: "P2: Add New Holidays"
+    action: "data_loop"
+    steps:
+      # 1. Open the Dialog
+      - action: "click"
+        locator: "xpath=(//button[@id='assign-button'])[2]"
+      - action: "silent_wait"
+        value: "2000"
+
+      # 2. Input Holiday Name
+      # Index [2] is the first input in the modal
+      - action: "input"
+        locator: "xpath=(//input[@id='search-button'])[2]"
+        value: "${holiday_name}"
+        clear_before: true
+
+      # 3. Select Date From
+      # Index [3] targets the second input (type="date")
+      - action: "input"
+        locator: "xpath=(//input[@id='search-button'])[3]"
+        value: "${date_from}"
+        clear_before: true
+
+      # 4. Select Date To
+      # Index [4] targets the third input (type="date")
+      - action: "input"
+        locator: "xpath=(//input[@id='search-button'])[4]"
+        value: "${date_to}"
+        clear_before: true
+
+      # 5. Create Holiday
+      - action: "click"
+        locator: "xpath=(//button[@id='assign-button'])[24]"
+      
+      - action: "silent_wait"
+        value: "5000"

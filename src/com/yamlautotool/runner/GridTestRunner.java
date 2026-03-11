@@ -20,15 +20,20 @@ public class GridTestRunner extends Project_Reports {
         try {
             runner = new GridTestRunner();
             // Point this to your Companies Grid YAML
-            runner.executeYaml("project_grid_full.yaml");
-          runner.executeYaml("companies_grid.yaml");
-          runner.executeYaml("resources_grid.yaml");
-          runner.executeYaml("skill_assignment.yaml");
-          runner.executeYaml("skill_categories.yaml");         
-          runner.executeYaml("skills.yaml");
-          runner.executeYaml("practice_roles.yaml");
-          runner.executeYaml("practice_master_grid.yaml");
-
+			/*
+			 * runner.executeYaml("project_grid_full.yaml");
+			 * runner.executeYaml("companies_grid.yaml");
+			 * runner.executeYaml("resources_grid.yaml");
+			 * runner.executeYaml("skill_assignment.yaml");
+			 * runner.executeYaml("skill_categories.yaml");
+			 * runner.executeYaml("skills.yaml"); runner.executeYaml("practice_roles.yaml");
+			 * runner.executeYaml("practice_master_grid.yaml");
+			 * runner.executeYaml("holiday_grid.yaml");
+			 * runner.executeYaml("users_grid_validation.yaml");
+			 */ 
+//            runner.executeYaml("roles_grid_validation.yaml");
+//			 runner.executeYaml("data_imports_grid_validation.yaml");
+			 runner.executeYaml("email_templates_grid_validation.yaml");
 
         } catch (Exception e) {
             e.printStackTrace();

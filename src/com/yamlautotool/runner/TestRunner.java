@@ -26,7 +26,8 @@ public class TestRunner extends Project_Reports {
 //            runner.executeYaml("skill_category_deactivate.yaml");
 //            runner.executeYaml("sub_skills_creation.yaml");
 //            runner.executeYaml("practice_designation_assignment.yaml");
-            runner.executeYaml("practice_master_creation.yaml");
+//            runner.executeYaml("practice_master_creation.yaml");
+            runner.executeYaml("holiday_creation.yaml");
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,0 +1,89 @@
+name: "Users Grid - Full UI & Sorting Validation"
+
+steps:
+  # --- SETUP: Standard Navigation ---
+  - action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/users"
+  - action: "silent_wait"
+    value: "10000"
+  - action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/users"
+  - action: "silent_wait"
+    value: "6000"
+
+  # --- PRIORITY 1: USER NAME (Sort & Hide) ---
+  - name: "Priority 1: User Name - Sort & Hide"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "8000"
+  # Sort Toggle
+  - action: "click"
+    locator: "xpath=//div[@data-field='userName']//*[contains(text(), 'Name')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='userName']//*[contains(text(), 'Name')]"
+  # Hide Logic via MUI Menu
+  - action: "hover"
+    locator: "xpath=//div[@role='columnheader' and @data-field='userName']"
+  - action: "silent_click"
+    locator: "xpath=//div[@data-field='userName']//button[contains(@class, 'MuiDataGrid-menuIcon')]"
+  - action: "click"
+    locator: "xpath=//li[@role='menuitem']//*[contains(text(), 'Hide column')]"
+
+  # --- PRIORITY 2: EMAIL (Sort & Hide) ---
+  - name: "Priority 2: Email - Sort & Hide"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "8000"
+  - action: "click"
+    locator: "xpath=//div[@data-field='email']//*[contains(text(), 'Email')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='email']//*[contains(text(), 'Email')]"
+  - action: "hover"
+    locator: "xpath=//div[@role='columnheader' and @data-field='email']"
+  - action: "silent_click"
+    locator: "xpath=//div[@data-field='email']//button[contains(@class, 'MuiDataGrid-menuIcon')]"
+  - action: "click"
+    locator: "xpath=//li[@role='menuitem']//*[contains(text(), 'Hide column')]"
+
+  # --- PRIORITY 3: ACTIVE STATUS (Sort & Hide) ---
+  - name: "Priority 3: Active Status - Sort & Hide"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "8000"
+  - action: "click"
+    locator: "xpath=//div[@data-field='active']//*[contains(text(), 'Active')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='active']//*[contains(text(), 'Active')]"
+  - action: "hover"
+    locator: "xpath=//div[@role='columnheader' and @data-field='active']"
+  - action: "silent_click"
+    locator: "xpath=//div[@data-field='active']//button[contains(@class, 'MuiDataGrid-menuIcon')]"
+  - action: "click"
+    locator: "xpath=//li[@role='menuitem']//*[contains(text(), 'Hide column')]"
+
+  # --- PRIORITY 4: FULL TRAVERSAL ---
+  - name: "Priority 4: Full Grid Traversal"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "8000"
+  - action: "full_traversal"
+
+  # --- PRIORITY 5: GLOBAL SWEEP SORTING ---
+  - name: "Priority 5: Global Header Sorting Sweep"
+    action: "refresh"
+  - action: "silent_wait"
+    value: "10000"
+  - action: "click"
+    locator: "xpath=//div[@data-field='userName']//*[contains(text(), 'Name')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='userName']//*[contains(text(), 'Name')]"
+    
+  - action: "click"
+    locator: "xpath=//div[@data-field='email']//*[contains(text(), 'Email')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='email']//*[contains(text(), 'Email')]"
+
+  - action: "click"
+    locator: "xpath=//div[@data-field='active']//*[contains(text(), 'Active')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='active']//*[contains(text(), 'Active')]"
