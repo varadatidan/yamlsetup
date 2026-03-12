@@ -1,0 +1,67 @@
+name: "Notification Templates Grid - Full UI & Sorting Validation"
+
+steps:
+  # --- SETUP: Dual Navigation Pattern ---
+  - action: "navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/notification-templates"
+  - action: "silent_wait"
+    value: "10000"
+  - action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/notification-templates"
+  - action: "silent_wait"
+    value: "6000"
+
+  # --- PRIORITY 1: DESCRIPTION (Sort & Hide) ---
+  - name: "Priority 1: Description - Sort & Hide"
+    action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/notification-templates"
+  - action: "silent_wait"
+    value: "8000"
+  # Sort Toggle
+  - action: "click"
+    locator: "xpath=//div[@data-field='description']//*[contains(text(), 'Description')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='description']//*[contains(text(), 'Description')]"
+  # Hide Logic (Hover + Silent Click for MUI Menu)
+  - action: "hover"
+    locator: "xpath=//div[@data-field='description']"
+  - action: "silent_click"
+    locator: "xpath=//div[@data-field='description']//button[contains(@aria-label, 'menu')]"
+  - action: "click"
+    locator: "xpath=//li[@role='menuitem']//*[contains(text(), 'Hide column')]"
+
+  # --- PRIORITY 2: MESSAGE (Sort & Hide) ---
+  - name: "Priority 2: Message - Sort & Hide"
+    action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/notification-templates"
+  - action: "silent_wait"
+    value: "8000"
+  - action: "click"
+    locator: "xpath=//div[@data-field='message']//*[contains(text(), 'Message')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='message']//*[contains(text(), 'Message')]"
+  - action: "hover"
+    locator: "xpath=//div[@data-field='message']"
+  - action: "silent_click"
+    locator: "xpath=//div[@data-field='message']//button[contains(@aria-label, 'menu')]"
+  - action: "click"
+    locator: "xpath=//li[@role='menuitem']//*[contains(text(), 'Hide column')]"
+
+  # --- PRIORITY 3: FULL TRAVERSAL ---
+  - name: "Priority 3: Full Grid Traversal"
+    action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/notification-templates"
+  - action: "silent_wait"
+    value: "8000"
+  - action: "full_traversal"
+
+  # --- PRIORITY 4: GLOBAL SWEEP ---
+  - name: "Priority 4: Global Header Sorting Sweep"
+    action: "silent_navigate"
+    url: "https://atresiq-demo-augqbvgzbjgjash3.centralindia-01.azurewebsites.net/admin/notification-templates"
+  - action: "silent_wait"
+    value: "10000"
+  - action: "click"
+    locator: "xpath=//div[@data-field='description']//*[contains(text(), 'Description')]"
+  - action: "click"
+    locator: "xpath=//div[@data-field='message']//*[contains(text(), 'Message')]"

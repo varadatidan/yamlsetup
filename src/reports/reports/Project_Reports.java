@@ -19,11 +19,11 @@ import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 
 public class Project_Reports {
 
-    protected WebDriver driver;
+    public WebDriver driver;
     protected WebDriverWait wait;
     protected JavascriptExecutor js;
     
-    protected static ExtentReports extent;
+    public static ExtentReports extent;
     protected static String reportDir;
     protected ExtentTest test;
 
