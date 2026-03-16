@@ -64,7 +64,12 @@ public class TestRunner extends Project_Reports {
         }
     }
 
-    private void handleDataLoop(TestCase testCase, Step loopStep, String ts) {
+    private void cleanup() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void handleDataLoop(TestCase testCase, Step loopStep, String ts) {
         if (testCase.testData != null) {
             for (Map<String, String> dataRow : testCase.testData) {
                 String firstVal = dataRow.values().iterator().next();
@@ -148,7 +153,7 @@ public class TestRunner extends Project_Reports {
             currentNode.fail("Failed: " + e.getMessage(), MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot("ERR_" + fileName)).build());
         }
     }
-
+ 
     private void waitForGridData() {
         try {
             wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[@role='row' and contains(@class, 'MuiDataGrid-row')]")));

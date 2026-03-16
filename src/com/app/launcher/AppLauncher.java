@@ -16,16 +16,16 @@ public class AppLauncher {
     private static List<String> absolutePaths = new ArrayList<>();
 
     public static void main(String[] args) {
-        // --- STEP 1: Apply Modern Dark Theme ---
+        // Apply Modern Dark Theme
         try {
             FlatDarkLaf.setup(); 
         } catch (Exception e) {
-            System.err.println("Failed to initialize FlatLaf");
+            System.err.println("FlatLaf failed to initialize.");
         }
 
         JFrame frame = new JFrame("ResIQ Automation Control Center");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(850, 550);
+        frame.setSize(900, 600);
         
         JPanel mainPanel = new JPanel(new BorderLayout(20, 20));
         mainPanel.setBorder(new EmptyBorder(25, 25, 25, 25));
@@ -38,29 +38,29 @@ public class AppLauncher {
 
         // --- LEFT PANEL: Queue Management ---
         JPanel leftPanel = new JPanel(new BorderLayout(10, 10));
-        leftPanel.setPreferredSize(new Dimension(350, 0));
+        leftPanel.setPreferredSize(new Dimension(380, 0));
         
         JList<String> fileList = new JList<>(fileListModel);
         fileList.setBackground(new Color(40, 40, 40));
         JScrollPane listScroll = new JScrollPane(fileList);
-        listScroll.setBorder(BorderFactory.createTitledBorder("Test Queue"));
+        listScroll.setBorder(BorderFactory.createTitledBorder("Execution Queue"));
 
         JPanel btnPanel = new JPanel(new GridLayout(1, 2, 10, 0));
         JButton addBtn = new JButton("➕ Add YAMLs");
-        JButton clearBtn = new JButton("🗑️ Clear Queue");
+        JButton clearBtn = new JButton("🗑️ Clear All");
         btnPanel.add(addBtn);
         btnPanel.add(clearBtn);
 
         leftPanel.add(listScroll, BorderLayout.CENTER);
         leftPanel.add(btnPanel, BorderLayout.SOUTH);
 
-        // --- RIGHT PANEL: Execution & Logs ---
+        // --- RIGHT PANEL: Configuration & Logs ---
         JPanel rightPanel = new JPanel(new BorderLayout(10, 10));
         
         JPanel configPanel = new JPanel(new GridLayout(2, 1, 5, 5));
         String[] modes = { "Standard Runner (Creation)", "Grid Runner (Validation)" };
         JComboBox<String> modeDropdown = new JComboBox<>(modes);
-        configPanel.add(new JLabel("Runner Engine:"));
+        configPanel.add(new JLabel("Runner Engine Mode:"));
         configPanel.add(modeDropdown);
 
         JTextArea logArea = new JTextArea();
@@ -113,12 +113,12 @@ public class AppLauncher {
             
             new Thread(() -> {
                 try {
-                    logArea.append("▶️ Initializing Batch Session...\n");
+                    logArea.append("▶️ Initializing Batch Execution...\n");
 
                     if (mode.contains("Grid")) {
                         GridTestRunner runner = new GridTestRunner();
                         
-                        // INITIALIZE ONCE
+                        // INITIALIZE ONCE (The fix for missing reports)
                         logArea.append("⚙️ Setup: Report & Browser Session...\n");
                         runner.setupSuite();
                         runner.setupBrowser();
@@ -128,9 +128,11 @@ public class AppLauncher {
                             runner.executeYaml(path);
                         }
 
-                        // CLEANUP ONCE
-                        runner.driver.quit();
+                        // FLUSH & CLOSE (Ensure reports are saved)
                         runner.extent.flush();
+                        runner.driver.quit();
+                        logArea.append("✅ Batch Finished! Opening Folder...\n");
+                        Desktop.getDesktop().open(new File(GridTestRunner.reportDir));
 
                     } else {
                         TestRunner runner = new TestRunner();
@@ -142,12 +144,13 @@ public class AppLauncher {
                             runner.executeYaml(path);
                         }
 
-                        runner.driver.quit();
                         runner.extent.flush();
+                        runner.driver.quit();
+                        logArea.append("✅ Batch Finished! Opening Folder...\n");
+                        Desktop.getDesktop().open(new File(TestRunner.reportDir));
                     }
 
-                    logArea.append("🏁 All tasks completed. Report saved.\n");
-                    JOptionPane.showMessageDialog(frame, "Batch Execution Finished!");
+                    JOptionPane.showMessageDialog(frame, "Batch execution completed successfully!");
                 } catch (Exception ex) {
                     logArea.append("❌ CRITICAL ERROR: " + ex.getMessage() + "\n");
                     ex.printStackTrace();
