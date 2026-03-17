@@ -2,167 +2,91 @@ package com.yamlautotool.runner;
 
 import reports.reports.Project_Reports;
 import com.aventstack.extentreports.MediaEntityBuilder;
-import com.aventstack.extentreports.ExtentTest;
 import com.yamlautotool.model.*;
 import com.yamlautotool.utils.YamlReader;
 import org.openqa.selenium.*;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.util.Map;
 
 public class TestRunner extends Project_Reports {
-
-    private ExtentTest currentNode;
-    private int stepCounter = 1; // Global counter to stop jumbling
-
-    public static void main(String[] args) {
-        TestRunner runner = null;
-        try {
-            runner = new TestRunner();
-            runner.executeYaml("skill_assign.yaml");
-            runner.executeYaml("skill_assignment_via_grid.yaml");       
-            runner.executeYaml("deactivate_skill_assignment.yaml");
-            runner.executeYaml("skill_category_creation.yaml");
-            runner.executeYaml("skill_category_deactivate.yaml");
-            runner.executeYaml("sub_skills_creation.yaml");
-            runner.executeYaml("practice_designation_assignment.yaml");
-            runner.executeYaml("practice_master_creation.yaml");
-            runner.executeYaml("holiday_creation.yaml");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (runner != null) {
-                if (runner.driver != null) runner.driver.quit(); 
-                if (runner.extent != null) runner.extent.flush();
-            }
-        }
-    }
+    private int stepCounter = 1;
 
     public void executeYaml(String yamlFile) throws Exception {
-        setupSuite();  
-        setupBrowser(); 
-        try {
-            TestCase testCase = YamlReader.loadTestCase(yamlFile);
-            test = extent.createTest(testCase.name); 
-            currentNode = test; 
-            String ts = new java.text.SimpleDateFormat("yyyyMMdd_HHmmss").format(new java.util.Date());
+        TestCase testCase = YamlReader.loadTestCase(yamlFile);
+        test = extent.createTest(testCase.name); 
+        String ts = new java.text.SimpleDateFormat("yyyyMMdd_HHmmss").format(new java.util.Date());
 
-            for (Step step : testCase.steps) {
-                if (step.name != null && !step.name.isEmpty()) {
-                    currentNode = test.createNode("<b>" + step.name + "</b>");
-                }
-
-                if ("data_loop".equalsIgnoreCase(step.action)) {
-                    handleDataLoop(testCase, step, ts);
-                } else {
-                    executeSingleStep(step, null, ts);
-                }
-            }
-        } finally {
-            cleanup(); 
-        }
-    }
-
-    private void cleanup() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void handleDataLoop(TestCase testCase, Step loopStep, String ts) {
-        if (testCase.testData != null) {
-            for (Map<String, String> dataRow : testCase.testData) {
-                String firstVal = dataRow.values().iterator().next();
-                ExtentTest iterationNode = currentNode.createNode("Iteration: " + firstVal);
-                
-                // Switch focus to iteration node
-                ExtentTest parent = currentNode;
-                currentNode = iterationNode;
-                
-                for (Step subStep : loopStep.steps) {
-                    executeSingleStep(subStep, dataRow, ts);
-                }
-                
-                currentNode = parent; // Switch back
+        for (Step step : testCase.steps) {
+            if ("data_loop".equalsIgnoreCase(step.action)) {
+                handleDataLoop(testCase, step, ts);
+            } else {
+                executeSingleStep(step, null, ts, test);
             }
         }
     }
 
-    private void executeSingleStep(Step step, Map<String, String> dataRow, String ts) {
-        String resVal = (step.value != null) ? step.value : (step.url != null ? step.url : "");
-        String resLoc = (step.locator != null) ? step.locator : "";
+    private void handleDataLoop(TestCase testCase, Step loopStep, String ts) {
+        for (Map<String, String> dataRow : testCase.testData) {
+            String firstVal = dataRow.values().iterator().next();
+            log("🔄 Iteration: " + firstVal);
+            com.aventstack.extentreports.ExtentTest iterNode = test.createNode("Iteration: " + firstVal);
+            for (Step subStep : loopStep.steps) {
+                executeSingleStep(subStep, dataRow, ts, iterNode);
+            }
+        }
+    }
+
+    private void executeSingleStep(Step step, Map<String, String> dataRow, String ts, com.aventstack.extentreports.ExtentTest node) {
+        String val = (step.value != null) ? step.value : (step.url != null ? step.url : "");
+        String loc = (step.locator != null) ? step.locator : "";
 
         if (dataRow != null) {
             for (Map.Entry<String, String> entry : dataRow.entrySet()) {
-                String key = "${" + entry.getKey() + "}";
-                resVal = resVal.replace(key, entry.getValue());
-                resLoc = resLoc.replace(key, entry.getValue());
+                val = val.replace("${" + entry.getKey() + "}", entry.getValue());
+                loc = loc.replace("${" + entry.getKey() + "}", entry.getValue());
             }
         }
-        performAction(step, resLoc, resVal, ts);
+        performAction(step, loc, val, ts, node);
     }
 
-    private void performAction(Step step, String locator, String value, String ts) {
-        String fileName = String.format("%03d_%s_%s", stepCounter++, step.action.toUpperCase(), ts);
-        
+    private void performAction(Step step, String loc, String val, String ts, com.aventstack.extentreports.ExtentTest node) {
+        String action = step.action.toLowerCase();
+        String fileName = String.format("%03d_%s", stepCounter++, action.toUpperCase());
         try {
-            switch (step.action.toLowerCase()) {
+            switch (action) {
                 case "navigate":
                 case "silent_navigate":
-                    driver.get(value);
-                    if (!step.action.contains("silent")) {
-                        waitForGridData();
-                        currentNode.pass("Navigated: " + value, MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot(fileName)).build());
-                    }
+                    log("🌐 Navigating: " + val);
+                    driver.get(val);
+                    if (!action.contains("silent")) node.pass("Navigated: " + val, MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot(fileName)).build());
                     break;
-
                 case "input":
-                    WebElement input = wait.until(ExpectedConditions.elementToBeClickable(getBy(locator)));
+                    log("⌨️ Input '" + val + "' into " + loc);
+                    WebElement input = wait.until(ExpectedConditions.elementToBeClickable(getBy(loc)));
                     input.click();
-                    if (step.clear_before) input.sendKeys(Keys.CONTROL + "a", Keys.DELETE);
-                    input.sendKeys(value);
+                    if (step.clear_before) { input.clear(); input.sendKeys(Keys.CONTROL + "a", Keys.DELETE); }
+                    input.sendKeys(val);
                     if (step.send_enter) input.sendKeys(Keys.ENTER);
-                    Thread.sleep(1500); 
-                    currentNode.pass("Entered: " + value, MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot(fileName)).build());
+                    node.pass("Entered: " + val);
                     break;
-
                 case "click":
                 case "silent_click":
-                    WebElement el = wait.until(ExpectedConditions.elementToBeClickable(getBy(locator)));
-                    ((JavascriptExecutor) driver).executeScript("arguments[0].click();", el);
-                    if (!step.action.contains("silent")) {
-                        Thread.sleep(1500);
-                        waitForGridData();
-                        currentNode.pass("Clicked: " + locator, MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot(fileName)).build());
-                    }
+                    log("🖱️ Clicking: " + loc);
+                    WebElement el = wait.until(ExpectedConditions.elementToBeClickable(getBy(loc)));
+                    js.executeScript("arguments[0].click();", el);
+                    if (!action.contains("silent")) node.pass("Clicked: " + loc, MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot(fileName)).build());
                     break;
-
-                case "custom_get_grid_count":
-                    waitForGridData();
-                    WebElement footer = wait.until(ExpectedConditions.visibilityOfElementLocated(getBy(locator)));
-                    currentNode.pass("<b>Result:</b> " + value + " | " + footer.getText(), 
-                        MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot(fileName)).build());
-                    break;
-
                 case "wait":
                 case "silent_wait":
-                    Thread.sleep(Long.parseLong(value));
+                    log("⏳ Waiting " + val + "ms");
+                    Thread.sleep(Long.parseLong(val));
                     break;
             }
         } catch (Exception e) {
-            currentNode.fail("Failed: " + e.getMessage(), MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot("ERR_" + fileName)).build());
+            log("❌ Step Failed: " + e.getMessage());
+            node.fail("Failed: " + e.getMessage(), MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot("ERR_" + fileName)).build());
         }
     }
- 
-    private void waitForGridData() {
-        try {
-            wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[@role='row' and contains(@class, 'MuiDataGrid-row')]")));
-            Thread.sleep(1000); 
-        } catch (Exception e) { }
-    }
 
-    private By getBy(String locator) {
-        if (locator.startsWith("xpath=")) return By.xpath(locator.substring(6));
-        return By.id(locator);
-    }
+    private By getBy(String l) { return l.startsWith("xpath=") ? By.xpath(l.substring(6)) : By.id(l); }
 }

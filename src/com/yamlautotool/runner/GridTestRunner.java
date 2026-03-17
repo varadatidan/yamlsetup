@@ -5,70 +5,114 @@ import com.aventstack.extentreports.MediaEntityBuilder;
 import com.aventstack.extentreports.ExtentTest;
 import com.yamlautotool.model.*;
 import com.yamlautotool.utils.YamlReader;
-
-import java.text.SimpleDateFormat;
-
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import java.io.File;
+import java.time.Duration;
 
 public class GridTestRunner extends Project_Reports {
     private ExtentTest currentNode;
-    private int stepIdx = 1;
+    private int stepIdx;
 
+    /**
+     * Standard executeYaml method called by AppLauncher.
+     */
     public void executeYaml(String yamlFile) throws Exception {
+        this.stepIdx = 1;
         TestCase testCase = YamlReader.loadTestCase(yamlFile);
-        test = extent.createTest(testCase.name); 
+        test = extent.createTest("Grid Validation: " + new File(yamlFile).getName());
         currentNode = test;
-        String ts = new SimpleDateFormat("HHmmss").format(new java.util.Date());
 
         for (Step step : testCase.steps) {
             if (step.name != null && !step.name.isEmpty()) {
                 currentNode = test.createNode("<b>" + step.name + "</b>");
             }
-            performAction(step, (step.locator != null ? step.locator : ""), (step.value != null ? step.value : ""), ts);
+            String val = (step.value != null) ? step.value : step.url;
+            performAction(step, (step.locator != null ? step.locator : ""), (val != null ? val : ""));
         }
     }
 
-    private void performAction(Step step, String locator, String value, String ts) {
-        String shotName = String.format("%03d_%s", stepIdx++, step.action.toUpperCase());
+    private void performAction(Step step, String loc, String val) {
+        String action = step.action.toLowerCase();
+        String shot = String.format("%03d_%s", stepIdx++, action.toUpperCase());
+        
         try {
-            switch (step.action.toLowerCase()) {
+            switch (action) {
+                
                 case "navigate":
                 case "silent_navigate":
-                    driver.get(value);
-                    if (!step.action.contains("silent")) {
-                        currentNode.pass("Navigated to: " + value, MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot(shotName)).build());
+                    log("🌐 Navigating to URL: " + val);
+                    driver.get(val); 
+                    Thread.sleep(5000); 
+                    if (!action.contains("silent")) {
+                        currentNode.pass("Navigated to: " + val, 
+                            MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot(shot)).build());
                     }
                     break;
+
                 case "click":
                 case "silent_click":
-                    WebElement el = wait.until(ExpectedConditions.elementToBeClickable(getBy(locator)));
-                    js.executeScript("arguments[0].click();", el);
-                    if (!step.action.contains("silent")) {
-                        Thread.sleep(2000);
-                        currentNode.pass("Clicked: " + locator, MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot(shotName)).build());
+                    log("🖱️ Clicking Element: " + loc);
+                    WebElement clickEl = wait.until(ExpectedConditions.elementToBeClickable(getBy(loc)));
+                    js.executeScript("arguments[0].click();", clickEl);
+                    if (!action.contains("silent")) {
+                        Thread.sleep(1000);
+                        currentNode.pass("Clicked: " + loc, 
+                            MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot(shot)).build());
                     }
                     break;
-                case "input":
-                    WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(getBy(locator)));
-                    if (step.clear_before) input.clear();
-                    input.sendKeys(value);
-                    if (step.send_enter) input.sendKeys(Keys.ENTER);
-                    currentNode.pass("Input '" + value + "' into " + locator);
+
+                case "hover":
+                    log("☁️ Hovering over: " + loc);
+                    WebElement hovEl = wait.until(ExpectedConditions.visibilityOfElementLocated(getBy(loc)));
+                    new Actions(driver).moveToElement(hovEl).pause(Duration.ofMillis(1000)).perform();
+                    currentNode.info("Hovered over: " + loc);
                     break;
+
+                case "refresh":
+                    log("🔄 Refreshing page...");
+                    driver.navigate().refresh();
+                    Thread.sleep(8000); 
+                    currentNode.info("Page Refreshed");
+                    break;
+
                 case "wait":
                 case "silent_wait":
-                    Thread.sleep(Long.parseLong(value));
+                    log("⏳ Sleeping for " + val + " ms");
+                    Thread.sleep(Long.parseLong(val));
+                    break;
+
+                case "input":
+                    log("⌨️ Typing '" + val + "' into " + loc);
+                    WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(getBy(loc)));
+                    if (step.clear_before) input.clear();
+                    input.sendKeys(val);
+                    if (step.send_enter) input.sendKeys(Keys.ENTER);
+                    currentNode.pass("Input value: " + val);
+                    break;
+
+                case "full_traversal":
+                    log("📜 Executing Full Grid Traversal (Scroll to Bottom)");
+                    js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
+                    Thread.sleep(2000);
+                    currentNode.pass("Full Traversal completed", 
+                        MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot(shot)).build());
+                    break;
+
+                default:
+                    log("⚠️ Action '" + action + "' not recognized.");
                     break;
             }
         } catch (Exception e) {
-            currentNode.fail("Step Failed: " + e.getMessage(), MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot("ERR_" + shotName)).build());
+            log("❌ Step Failed: " + e.getMessage());
+            currentNode.fail("<b>Step Failed:</b> " + e.getMessage(), 
+                MediaEntityBuilder.createScreenCaptureFromPath(takeScreenshot("ERR_" + shot)).build());
         }
     }
 
-    private By getBy(String locator) {
-        if (locator.startsWith("xpath=")) return By.xpath(locator.substring(6));
-        return By.id(locator);
+    private By getBy(String l) {
+        if (l.startsWith("xpath=")) return By.xpath(l.substring(6));
+        return By.id(l);
     }
 }
