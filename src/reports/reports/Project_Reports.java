@@ -9,6 +9,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import com.aventstack.extentreports.*;
 import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
+
 public class Project_Reports {
 
     public WebDriver driver;
@@ -43,17 +45,39 @@ public class Project_Reports {
     }
 
     public void setupBrowser() {
-        String driverPath = System.getProperty("user.dir") + File.separator + "resources" + File.separator + "msedgedriver.exe";
-        System.setProperty("webdriver.edge.driver", driverPath);
-        EdgeOptions options = new EdgeOptions();
-        options.addArguments("--remote-allow-origins=*", "--start-maximized");
-        if (isHeadless) {
-            options.addArguments("--headless=new", "--disable-gpu", "--window-size=1920,1080");
+        log("Initializing Edge Browser Setup...");
+        
+        try {
+            // --- THE FIX ---
+            // This replaces the manual .exe path. It detects version 145 or 146
+            // based on whichever computer is currently running the App Launcher.
+            WebDriverManager.edgedriver().setup(); 
+
+            EdgeOptions options = new EdgeOptions();
+            options.addArguments("--remote-allow-origins=*", "--start-maximized");
+            
+            if (isHeadless) {
+                options.addArguments("--headless=new", "--disable-gpu", "--window-size=1920,1080");
+            }
+
+            // Keep this as a fallback, but Edge usually finds its own binary
+            String edgeBinary = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
+            if (new File(edgeBinary).exists()) {
+                options.setBinary(edgeBinary);
+            }
+
+            driver = new EdgeDriver(options);
+            wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+            js = (JavascriptExecutor) driver;
+            
+            log("Browser initialized successfully.");
+            
+        } catch (Exception e) {
+            log("CRITICAL ERROR: Browser setup failed. " + e.getMessage());
+            if (test != null) {
+                test.fail("Could not start browser: " + e.getMessage());
+            }
         }
-        options.setBinary("C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe");
-        driver = new EdgeDriver(options);
-        wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-        js = (JavascriptExecutor) driver;
     }
 
     public String takeScreenshot(String name) {
