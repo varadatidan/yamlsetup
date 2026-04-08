@@ -29,16 +29,15 @@ public class AboutDialog extends JDialog {
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // 3. Developer Info
-        JLabel devInfo = new JLabel("Lead Developer: Varad");
+        JLabel devInfo = new JLabel("Lead Developer:");
         devInfo.setFont(new Font("Segoe UI", Font.ITALIC, 14));
         devInfo.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // 4. Description Area
         JTextPane description = new JTextPane();
-        description.setText("\nA GenAI-powered automation framework designed for rapid Azure MuiDataGrid validation. \n\n" +
+        description.setText("\nA GenAI-powered automation framework designed for rapid Automation validation. \n\n" +
                            "Features:\n" +
                            "• Keyword-Driven YAML Execution\n" +
-                           "• Gemini 2.5 Flash AI Script Architect\n" +
                            "• Extent Report Integration\n" +
                            "• Headless Execution Support");
         description.setEditable(false);
