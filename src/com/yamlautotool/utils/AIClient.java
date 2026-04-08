@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 public class AIClient {
 
     // 1. YOUR API KEY FROM THE SCREENSHOT
-    private static final String API_KEY = "AIzaSyDcOppFDWYvXIbb1OomKAFT17vwA8LBajw";
+    private static final String API_KEY = "YOUR_KEY";
     
     // 2. UPDATED 2026 URL (Using Gemini 2.5 Flash)
     private static final String GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + API_KEY;
