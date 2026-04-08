@@ -24,4 +24,11 @@ public class YamlReader {
 	        e.printStackTrace();
 	        return null;
 	    }
-	}}
+	
+	}
+
+	public static String getLocatorsAsContext() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	}
